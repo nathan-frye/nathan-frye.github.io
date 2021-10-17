@@ -1,16 +1,41 @@
 <!DOCTYPE html>
 <html>
+
   <head>
 
+    <!-- Tried putting into .css file, but for some reason localhost won't use .css files -->
     <style>
-        svg{
-            display: block;
-            margin: auto;
-        }
-        h1{
-            text-align: center;
-            background-color: red;
-        }
+      
+      svg
+      {
+        display: block;
+        margin: auto;
+      }
+
+      body{
+        background-color: lightgray;
+      }
+  
+      header{
+        text-align: center;
+        background-color: lightblue;
+      }
+
+      nav{
+        text-align: center;
+        background-color: lightgreen;
+      }
+
+      section{
+        text-align: center;
+        background-color: lightsteelblue;
+      }
+
+      footer{
+        text-align: center;
+        background-color: lightsalmon;
+      }
+  
     </style>
 
     <meta charset="UTF-8"/>
@@ -18,13 +43,38 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
   </head>
+
   <body>
 
-    <h1 text-align:center>Team Podiums Earned</h1>
+    <header>
 
-    <svg id="linechart"></svg>
+      <h1>Team Podiums Earned</h1>
 
-    <!--<script src="chart.js"></script>-->
+    </header>
+    
+    <nav>
+
+      <h2>This is our navigation bar</h2>
+
+    </nav>
+
+    <section>
+
+      <h2>This is our chart area</h2>
+      
+      <svg id="chart"></svg>
+      <!--<script src="chart.js"></script>-->
+      
+
+    </section>
+
+    <footer>
+
+      <h2>This is our footer</h2>
+
+    </footer>
+
     
   </body>
+
 </html>
