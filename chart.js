@@ -11,9 +11,20 @@ d3.json("data.json").then(function(dataset)
         }
     }
 
+    /*
     var svg = d3.select("#linechart")
                 .style("width", dimensions.width)
                 .style("height", dimensions.height)
+
+    var data
+
+    var accessor
+
+    var xScale
+
+    var yScale
+
+    var dots
     
-    var labels
+    */
 })
