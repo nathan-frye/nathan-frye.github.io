@@ -135,6 +135,8 @@ Promise.all([
 
     //update the graph when a new year is selected
     function update(newData){
+        svg.selectAll("*").remove()
+
         races = years.get(String(newData))
 
         raceStandings = d3.group(dataset[2], d=>d.raceId)
@@ -157,7 +159,8 @@ Promise.all([
         })
 
         labels = data.map(d => d.name)
-        //console.log(labels)//FIXME
+        //console.log(labels)
+        //FIXME
         xScale = d3.scaleBand()
                         .domain(labels)
                         .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
@@ -174,7 +177,11 @@ Promise.all([
         xAxisgen = d3.axisBottom().scale(xScale)
         yAxisgen = d3.axisLeft().scale(yScale)
 
-        xAxis
+        //replaced these with svg.remove
+        //xAxis.remove()
+        //yAxis.remove()
+
+        xAxis = svg.append("g")
             .call(xAxisgen)
             .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
             .selectAll("text")
@@ -182,11 +189,12 @@ Promise.all([
                 .attr("dy", ".2em")
                 .attr("transform", "rotate(-65)")
 
-        yAxis
+        yAxis = svg.append("g")
             .call(yAxisgen)
             .style("transform", `translateX(${dimensions.margin.left}px)`)
         
-        bars.remove()
+        //replaced these with svg.remov
+        //bars.remove()
         bars = svg.selectAll("rect")
             .data(data)
             .enter()
