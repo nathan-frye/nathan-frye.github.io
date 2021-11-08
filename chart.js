@@ -115,8 +115,8 @@ Promise.all([
                     .call(xAxisgen)
                     .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
                     .selectAll("text")
-                        .attr("dx", "-2em")
-                        .attr("dy", ".2em")
+                        .attr("dx", "-4em")
+                        .attr("dy", ".35em")
                         .attr("transform", "rotate(-65)")
 
     var yAxis = svg.append("g")
@@ -137,7 +137,7 @@ Promise.all([
     function update(newData){
         races = years.get(String(newData))
 
-        //raceStandings = d3.group(dataset[2], d=>d.raceId)
+        raceStandings = d3.group(dataset[2], d=>d.raceId)
 
         seasonInfo = races.flatMap(function(v){
             return raceStandings.get(v.raceId)
@@ -145,7 +145,7 @@ Promise.all([
 
         driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
 
-        //driverNames = d3.group(dataset[0], d => d.driverId)
+        driverNames = d3.group(dataset[0], d => d.driverId)
 
         points = Array.from(driverPoints.values())
 
@@ -157,7 +157,7 @@ Promise.all([
         })
 
         labels = data.map(d => d.name)
-
+        //console.log(labels)//FIXME
         xScale = d3.scaleBand()
                         .domain(labels)
                         .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
@@ -178,7 +178,7 @@ Promise.all([
             .call(xAxisgen)
             .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
             .selectAll("text")
-                .attr("dx", "-2em")
+                .attr("dx", "-4em")
                 .attr("dy", ".2em")
                 .attr("transform", "rotate(-65)")
 
