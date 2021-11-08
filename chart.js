@@ -3,7 +3,7 @@ Access driverInfo.csv with dataset[0], raceInfo with dataset[1], etc.*/
 Promise.all([
     d3.csv("driverInfo.csv"),
     d3.csv("raceInfo.csv"),
-    d3.csv("standingsInfo.csv"),
+    d3.csv("results.csv"),
 ]).then(function(dataset)
 {
     var dimensions = {
