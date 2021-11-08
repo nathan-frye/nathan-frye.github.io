@@ -11,7 +11,7 @@ Promise.all([
         height: 800,
         margin: {
             top: 10,
-            bottom: 50,
+            bottom: 100,
             right: 10,
             left: 50
         }
@@ -27,8 +27,24 @@ Promise.all([
     var years = d3.group(dataset[1], d=>d.year)
     //console.log(years)
 
+    //create array of just the years for the dropdown
+    var yearsOnly=[];
+    for(var i = 1950; i <= 2020; i++){
+        yearsOnly.push(i)
+    }
+    //console.log(yearsOnly)
+
+    //add options to button
+    d3.select("#selectButton")
+        .selectAll('myOptions')
+            .data(yearsOnly)
+        .enter()
+            .append('option')
+        .text(d => d)
+        .attr("value", d => d)
+    
     //Extract exact year (season) we're working with
-    var races = years.get("2007")
+    var races = years.get("1950")
     //console.log(races)
 
     //Group data by raceId
@@ -116,4 +132,80 @@ Promise.all([
                     .attr("width", xScale.bandwidth())
                     .attr("height", d => dimensions.height - dimensions.margin.bottom - yScale(d.points))
                     .attr("fill", d => scaleColor(d.name))
+
+    //update the graph when a new year is selected
+    function update(newData){
+        races = years.get(String(newData))
+
+        //raceStandings = d3.group(dataset[2], d=>d.raceId)
+
+        seasonInfo = races.flatMap(function(v){
+            return raceStandings.get(v.raceId)
+        })
+
+        driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
+
+        //driverNames = d3.group(dataset[0], d => d.driverId)
+
+        points = Array.from(driverPoints.values())
+
+        temp = Array.from(driverPoints)
+
+        data = temp.map(function(v){
+            var d = driverNames.get(v[0])
+            return {name: d[0].forename + " " + d[0].surname, points: v[1]}
+        })
+
+        labels = data.map(d => d.name)
+
+        xScale = d3.scaleBand()
+                        .domain(labels)
+                        .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
+                        .padding(0.2)
+
+        yScale = d3.scaleLinear()
+                        .domain([0, d3.max(points)])
+                        .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
+
+        scaleColor = d3.scaleOrdinal()
+                            .domain(labels)
+                            .range(d3.schemeCategory10)
+
+        xAxisgen = d3.axisBottom().scale(xScale)
+        yAxisgen = d3.axisLeft().scale(yScale)
+
+        xAxis
+            .call(xAxisgen)
+            .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
+            .selectAll("text")
+                .attr("dx", "-2em")
+                .attr("dy", ".2em")
+                .attr("transform", "rotate(-65)")
+
+        yAxis
+            .call(yAxisgen)
+            .style("transform", `translateX(${dimensions.margin.left}px)`)
+        
+        bars.remove()
+        bars = svg.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", d => xScale(d.name))
+            .attr("y", d => yScale(d.points))
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => dimensions.height - dimensions.margin.bottom - yScale(d.points))
+            .attr("fill", d => scaleColor(d.name))
+
+    }
+
+    //default year if don't want to start blank
+    //update(yearsOnly[0])
+
+    //add years to the dropdown
+    d3.select("#selectButton")
+        .on('change', function() {
+            var newData = eval(d3.select(this).property('value'));
+            update(newData);
+        })
 })
