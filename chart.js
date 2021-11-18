@@ -32,76 +32,34 @@ Promise.all([
     for(var i = 1950; i <= 2020; i++){
         yearsOnly.push(i)
     }
+
+    var yearsRange=[];
+    for(var i = 1990; i <=2020; i++){
+        yearsRange.push(i)
+    }
     //console.log(yearsOnly)
 
-    //add options to button
-    d3.select("#selectButton")
-        .selectAll('myOptions')
-            .data(yearsOnly)
-        .enter()
-            .append('option')
-        .text(d => d)
-        .attr("value", d => d)
-    
-    //Extract exact year (season) we're working with
-    var races = years.get("1950")
+    var startYear = "1990"
+    //Extract exact year (season) we're starting with
+    var races = years.get("1990")
     //console.log(races)
 
     //Group data by raceId
     var raceStandings = d3.group(dataset[2], d=>d.raceId)
     //console.log(raceStandings)
 
-    //Extract race info for the year (season) we're working with
-    var seasonInfo = races.flatMap(function(v){
-        return raceStandings.get(v.raceId)
-    })
-    //console.log(seasonInfo)
-
-    //Tie the driverID to the total points earned by that driver for the year (season)
-    var driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
-    //console.log(driverPoints)
-
-    //Make an array of relevant drivers for the year
-    //var drivers = Array.from(driverPoints.keys())
-    //console.log(drivers)
-
-    //Map all driver info to driverId (aka surname and forename)
-    var driverNames = d3.group(dataset[0], d => d.driverId)
-    //console.log(driverNames)
-
-    //Map driverId to full name (forename + surname)
-    /*var driverData = drivers.flatMap(function(v){
-        var d = driverNames.get(v)
-        return {driverId: d[0].driverId, name: d[0].forename + " " + d[0].surname}
-    })*/
-    //console.log(driverData)
-
-    //Make an array of total points earned for y-axis
-    var points = Array.from(driverPoints.values())
-    //console.log(points)
-
-    //Convert driverPoints into an array
-    var temp = Array.from(driverPoints)
-    //console.log(temp)
-
-    //Map full driver names to their total points earned for the year (season)
-    var data = temp.map(function(v){
-        var d = driverNames.get(v[0])
-        return {name: d[0].forename + " " + d[0].surname, points: v[1]}
-    })
-    //console.log(data)
-
-    //Create our labels for the x-axis
-    var labels = data.map(d => d.name)
+    var labels = yearsRange;
     //console.log(labels)
 
+    //set up x and y axis
     var xScale = d3.scaleBand()
                     .domain(labels)
                     .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-                    .padding(0.2)
+                    //.padding(0.2)
 
+    //using 450 temporarily, in future want to use % of total
     var yScale = d3.scaleLinear()
-                    .domain([0, d3.max(points)])
+                    .domain([0, 450])
                     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
     var scaleColor = d3.scaleOrdinal()
@@ -114,106 +72,121 @@ Promise.all([
     var xAxis = svg.append("g")
                     .call(xAxisgen)
                     .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
-                    .selectAll("text")
-                        .attr("dx", "-4em")
-                        .attr("dy", ".35em")
-                        .attr("transform", "rotate(-65)")
+                    //.selectAll("text")
+                        //.attr("dx", "-4em")
+                        //.attr("dy", ".1em")
+                        //.attr("transform", "rotate(-65)")
 
     var yAxis = svg.append("g")
                     .call(yAxisgen)
                     .style("transform", `translateX(${dimensions.margin.left}px)`)
     
-    var bars = svg.selectAll("rect")
-                    .data(data)
-                    .enter()
-                    .append("rect")
-                    .attr("x", d => xScale(d.name))
-                    .attr("y", d => yScale(d.points))
-                    .attr("width", xScale.bandwidth())
-                    .attr("height", d => dimensions.height - dimensions.margin.bottom - yScale(d.points))
-                    .attr("fill", d => scaleColor(d.name))
+    //Extract race info for the year (season) we're working with
+    var seasonInfo = races.flatMap(function(v){
+        return raceStandings.get(v.raceId)
+    })
+    //console.log(seasonInfo)
 
-    //update the graph when a new year is selected
-    function update(newData){
-        svg.selectAll("*").remove()
+    //Tie the driverID to the total points earned by that driver for the year (season)
+    var driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
+    //console.log(driverPoints)
 
-        races = years.get(String(newData))
+    //Make an array of total points earned for y-axis
+    var points = Array.from(driverPoints.values())
+    //console.log(points)
 
-        raceStandings = d3.group(dataset[2], d=>d.raceId)
+    //Map all driver info to driverId (aka surname and forename)
+    var driverNames = d3.group(dataset[0], d => d.driverId)
+    //console.log(driverNames)
+    
 
+    //Convert driverPoints into an array
+    var temp = Array.from(driverPoints)
+    //console.log(temp) 
+
+    //Map full driver names to their total points earned for the year (season)
+    var data = temp.map(function(v){
+        var d = driverNames.get(v[0])
+        return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0]}
+    })
+
+    var bars = svg.selectAll("dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.year) + 25)
+        .attr("cy", d => yScale(d.points))
+        .attr("r", 5)
+        .attr("fill", d => scaleColor(d.name))
+
+    var lines = svg.selectAll("path")
+        .data(data)
+        .attr("fill", "none")
+        .attr("stroke", d=> scaleColor(d.name))
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(d => xScale(d.year))
+            .y(d => yScale(d.points))
+        )
+
+    
+
+    //loop to create rest of dots
+    for(var i = 1; i <= 30; i++){
+        races = years.get(String(labels[i]))
+
+        //Extract race info for the year (season) we're working with
         seasonInfo = races.flatMap(function(v){
             return raceStandings.get(v.raceId)
         })
-
+        //console.log(seasonInfo)
+    
         driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
-
-        driverNames = d3.group(dataset[0], d => d.driverId)
-
+        
         points = Array.from(driverPoints.values())
-
+        
+        driverNames = d3.group(dataset[0], d => d.driverId)
+        
+    
         temp = Array.from(driverPoints)
-
+        
         data = temp.map(function(v){
             var d = driverNames.get(v[0])
-            return {name: d[0].forename + " " + d[0].surname, points: v[1]}
+            return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[i]}
         })
-
-        labels = data.map(d => d.name)
-        //console.log(labels)
-        //FIXME
-        xScale = d3.scaleBand()
-                        .domain(labels)
-                        .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-                        .padding(0.2)
-
-        yScale = d3.scaleLinear()
-                        .domain([0, d3.max(points)])
-                        .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
-
-        scaleColor = d3.scaleOrdinal()
-                            .domain(labels)
-                            .range(d3.schemeCategory10)
-
-        xAxisgen = d3.axisBottom().scale(xScale)
-        yAxisgen = d3.axisLeft().scale(yScale)
-
-        //replaced these with svg.remove
-        //xAxis.remove()
-        //yAxis.remove()
-
-        xAxis = svg.append("g")
-            .call(xAxisgen)
-            .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
-            .selectAll("text")
-                .attr("dx", "-4em")
-                .attr("dy", ".2em")
-                .attr("transform", "rotate(-65)")
-
-        yAxis = svg.append("g")
-            .call(yAxisgen)
-            .style("transform", `translateX(${dimensions.margin.left}px)`)
-        
-        //replaced these with svg.remov
-        //bars.remove()
-        bars = svg.selectAll("rect")
+    
+        bars = svg.selectAll("dot")
             .data(data)
             .enter()
-            .append("rect")
-            .attr("x", d => xScale(d.name))
-            .attr("y", d => yScale(d.points))
-            .attr("width", xScale.bandwidth())
-            .attr("height", d => dimensions.height - dimensions.margin.bottom - yScale(d.points))
+            .append("circle")
+            .attr("cx", d => xScale(d.year) + 25)
+            .attr("cy", d => yScale(d.points))
+            .attr("r", 5)
             .attr("fill", d => scaleColor(d.name))
 
+        lines = svg.selectAll("path")
+            .data(data)
+            .attr("fill", "none")
+            .attr("stroke", d=> scaleColor(d.name))
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()
+                .x(d => xScale(d.year))
+                .y(d => yScale(d.points))
+            )
+    
+    
     }
 
-    //default year if don't want to start blank
-    //update(yearsOnly[0])
+    //Make an array of relevant drivers for the year
+    //var drivers = Array.from(driverPoints.keys())
+    //console.log(drivers)
 
-    //add years to the dropdown
-    d3.select("#selectButton")
-        .on('change', function() {
-            var newData = eval(d3.select(this).property('value'));
-            update(newData);
-        })
+
+
+    //console.log(data)
+
+    //Create our labels for the x-axis
+    //var labels = data.map(d => d.name)
+    
+
 })
