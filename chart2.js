@@ -134,6 +134,9 @@ Promise.all([
         .append("circle")
         //using for loops here doesn't really work either, as it is not putting a dot in each
         //iteration of the loop but moving the positions of the would be dot around
+        //can maybe try loop{
+        //                  .attr(...)
+        //              }
         .attr("cx", d => {
             //console.log(d[0])
             for(var i = 0; i < d.length; i++){
