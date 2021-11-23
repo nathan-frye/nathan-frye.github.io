@@ -337,7 +337,7 @@ Promise.all([
     **-Better Colors --------------------------------------------------------------------------------------- INCOMPLETE
     **  -Right now colors get repeated in the same year and individuals get lost, need a unique color for each driver?
     **
-    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ---------------- COMPLETE
+    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ------------- IN PROGRESS
     **  -Mouseover will also bring up a popup with driver name (and points as well if a dot?)
     **  -Mayber other info?
     **
