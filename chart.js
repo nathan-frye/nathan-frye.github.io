@@ -118,7 +118,7 @@ Promise.all([
         .append("circle")
         .attr("cx", d => xScale(d.year) + 18)
         .attr("cy", d => yScale((d.points / totForyear) * 100))
-        .attr("r", 5)
+        .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
 
@@ -169,7 +169,7 @@ Promise.all([
             .append("circle")
             .attr("cx", d => xScale(d.year) + 18)
             .attr("cy", d => yScale((d.points / totForyear) * 100))
-            .attr("r", 5)
+            .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
 
@@ -190,11 +190,71 @@ Promise.all([
     
     }
 
-//    console.log(dotArr[0]._groups[0][0].attributes[4].textContent)
+    console.log(dotArr)
+
+    /*Adding the lines by looking at information for one year, and then comparing it to the next
+      year and seeing if that driver competed between multiple years.
+    */
+    var sourceX = 0
+    var sourceY = 0
+    var targetX = 0
+    var targetY = 0
+    var currName = "none"
+
+    //loop through years minus one because last year doesn't connect to anything
+    for(var i = 0; i < 30; i++){
+        //loop through drivers in a year i
+        for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+
+            //pull out specific name, and find it in the next year
+            currName = dotArr[i]._groups[0][k].attributes[4].textContent
+
+            //set source x and y from current driver
+            sourceX = dotArr[i]._groups[0][k].cx.baseVal.value
+            sourceY = dotArr[i]._groups[0][k].cy.baseVal.value
+
+            //loop through the next year i + 1 and find the driver
+            for(var j = 0; j < dotArr[i + 1]._groups[0].length; j ++){
+
+                //find same driver if they are in that year
+                if(dotArr[i + 1]._groups[0][j].attributes[4].textContent == currName){
+                    
+                    //set target x and y from current driver from the next year
+                    targetX = dotArr[i + 1]._groups[0][j].cx.baseVal.value
+                    targetY = dotArr[i + 1]._groups[0][j].cy.baseVal.value
+
+                    //draw the line
+                    //console.log(sourceX + " " + sourceY + " " + targetX + " " + targetY)
+                    svg.append("line")
+                        .attr("stroke", scaleColor(currName)) //scaleColor(currName) use once working
+                        .attr("stoke-width", 1)
+                        .attr("x1", sourceX)
+                        .attr("y1", sourceY)
+                        .attr("x2", targetX)
+                        .attr("y2", targetY)
+                        .attr("name", currName)
+                        .on('mouseover', function(){
+                            d3.select(this)
+                                .attr("stroke-width", 4)
+                        })
+                        .on('mouseout', function(){
+                            d3.select(this)
+                                .attr("stroke-width", 1)
+                        })
+                }
+            }
+        }
+    }
+
+    //array to store all the dots, can be used for making the connecting lines?
+    //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
+    //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
+
 
     //toggle button to filter out drivers with 0 points
     /*PROBLEM WITH BUTTON, only removes from most recent year(2020)? Possibly because of using a
-      loop to add the dots? Though button is not very necessary to be honest...
+      loop to add the dots? Though button is not very necessary to be honest... possible useful
+      to add more filters for like top 10% or top 50% or something like that.
     *
     var boolFilter = 0
     d3.select("#tog0").on('click', function(){
