@@ -107,7 +107,7 @@ Promise.all([
         return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0]}
     })
 
-    //array to store all the dots, can be used for making the connecting lines?
+    //array to store all the dots, used later for making the connecting lines
     //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
     //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
     var dotArr = []
@@ -121,21 +121,17 @@ Promise.all([
         .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
+        .on('mouseover', function(){
+            highLight(d3.select(this))
+        })
+        .on('mouseout', function(){
+            unHighLight(d3.select(this))
+        })
+
 
     dotArr.push(dots)
-    /*
-    var lines = svg.selectAll("path")
-        .data(data)
-        .attr("fill", "none")
-        .attr("stroke", d=> scaleColor(d.name))
-        .attr("stroke-width", 1.5)
-        .attr("d", d3.line()
-            .x(d => xScale(d.year))
-            .y(d => yScale(d.points))
-        )
-    */
 
-    //loop to create rest of dots
+    //loop to create rest of dots all variables are used same as above
     for(var i = 1; i <= 30; i++){
         races = years.get(String(labels[i]))
 
@@ -172,26 +168,19 @@ Promise.all([
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
+            .on('mouseover', function(){
+                highLight(d3.select(this))
+            })
+            .on('mouseout', function(){
+                unHighLight(d3.select(this))
+            })
 
-        dotArr.push(dots)
 
-        /* add lines later
-        lines = svg.selectAll("path")
-            .data(data)
-            .attr("fill", "none")
-            .attr("stroke", d=> scaleColor(d.name))
-            .attr("stroke-width", 1.5)
-            .attr("d", d3.line()
-                .x(d => xScale(d.year))
-                .y(d => yScale(d.points))
-            )
-        */
-    
-    
+
+        dotArr.push(dots)    
     }
 
-    console.log(dotArr)
-
+    
     /*Adding the lines by looking at information for one year, and then comparing it to the next
       year and seeing if that driver competed between multiple years.
     */
@@ -200,8 +189,10 @@ Promise.all([
     var targetX = 0
     var targetY = 0
     var currName = "none"
+    var edge
+    var lines = []
 
-    //loop through years minus one because last year doesn't connect to anything
+    //loop through years
     for(var i = 0; i < 30; i++){
         //loop through drivers in a year i
         for(var k = 0; k < dotArr[i]._groups[0].length; k++){
@@ -225,36 +216,97 @@ Promise.all([
 
                     //draw the line
                     //console.log(sourceX + " " + sourceY + " " + targetX + " " + targetY)
-                    svg.append("line")
+                    edge = svg.append("line")
                         .attr("stroke", scaleColor(currName)) //scaleColor(currName) use once working
-                        .attr("stoke-width", 1)
+                        .attr("stroke-width", 1)
                         .attr("x1", sourceX)
                         .attr("y1", sourceY)
                         .attr("x2", targetX)
                         .attr("y2", targetY)
                         .attr("name", currName)
                         .on('mouseover', function(){
-                            d3.select(this)
-                                .attr("stroke-width", 4)
+                            highLight(d3.select(this))
                         })
                         .on('mouseout', function(){
-                            d3.select(this)
-                                .attr("stroke-width", 1)
+                            unHighLight(d3.select(this))
                         })
+
+                        lines.push(edge)
                 }
             }
         }
     }
 
-    //array to store all the dots, can be used for making the connecting lines?
-    //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
-    //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
+    /*When mousing over a dot or line, use its attribute "name" to find all of the corresponding
+      dots and lines and make them larger, so that the driver is more easily distinguishable throughout
+      the graph.
+    */
+    //console.log(dotArr[20]._groups[0][0].attributes)
+    console.log(lines[0]._groups[0][0].attributes)
+
+    function highLight(theName){
+
+        //pull out the name of driver to be highlighted
+        var tempName = theName._groups[0][0].attributes.name.textContent
+        //console.log(theName._groups[0][0].attributes.name.textContent)
+        //console.log(tempName)
+
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //if find the name, change the attribute for r to 8 making the dot larger
+                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
+                    dotArr[i]._groups[0][k].attributes.r.value = 8
+                }
+            }
+        }
+
+        //do it all again for lines
+        //loop through the lines
+        for(var i = 0; i < lines.length; i++){
+            if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
+                lines[i]._groups[0][0].attributes[1].value = 5
+                //console.log(lines[i]._groups[0][0].attributes.stroke-width.value)
+            }
+        }
+    }
+
+    /*Opposite of highLight, returns the dots and lines to normal
+    */
+    function unHighLight(theName){
+        //pull out the name of driver to be highlighted
+        var tempName = theName._groups[0][0].attributes.name.textContent
+        //console.log(theName._groups[0][0].attributes.name.textContent)
+        //console.log(tempName)
+
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //if find the name, change the attribute for r to 8 making the dot larger
+                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
+                    dotArr[i]._groups[0][k].attributes.r.value = 3
+                }
+            }
+        }
+
+        //do it all again for lines
+        //loop through the lines
+        for(var i = 0; i < lines.length; i++){
+            if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
+                lines[i]._groups[0][0].attributes[1].value = 1
+                //console.log(lines[i]._groups[0][0].attributes.stroke-width.value)
+            }
+        }        
+    }
 
 
     //toggle button to filter out drivers with 0 points
-    /*PROBLEM WITH BUTTON, only removes from most recent year(2020)? Possibly because of using a
-      loop to add the dots? Though button is not very necessary to be honest... possible useful
-      to add more filters for like top 10% or top 50% or something like that.
+    /*PROBLEM WITH BUTTON, this changes year to year, so should filter out driver with 0 points in 1 year, 
+      but not their other years, or only remove that driver for the one year they have 0 points, but what
+      about the lines? This also needs to change and use dotArr and lines, becuase this implementation only
+      affects the last year (2020) due to using a loop to create the dots
     *
     var boolFilter = 0
     d3.select("#tog0").on('click', function(){
@@ -278,17 +330,27 @@ Promise.all([
         }
     })
     */
-   
-    //Make an array of relevant drivers for the year
-    //var drivers = Array.from(driverPoints.keys())
-    //console.log(drivers)
 
+    /******************************************************************************************************************
+    ** NEED TO DO:
+    **
+    **-Better Colors --------------------------------------------------------------------------------------- INCOMPLETE
+    **  -Right now colors get repeated in the same year and individuals get lost, need a unique color for each driver?
+    **
+    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ---------------- COMPLETE
+    **  -Mouseover will also bring up a popup with driver name (and points as well if a dot?)
+    **  -Mayber other info?
+    **
+    **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ INCOMPLETE
+    **  -Graph is crowded, may need to have ability to clear it up, depending on if highlighting works well or not
+    **
+    **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
+    **  -Clicking dot or line will be used to select the driver for a secondary visualization
+    **      -What information will this secondary vis have? Will be in a separate svg underneath or on the side.
+    **          -Single season? Name, teammate, teamname(i.e. ferrari), points scored that season
+    **          -Career? Name, similar to first graph but only the single driver? Total lifetime points
+    **
+    *///***************************************************************************************************************
 
-
-    //console.log(data)
-
-    //Create our labels for the x-axis
-    //var labels = data.map(d => d.name)
-    
 
 })
