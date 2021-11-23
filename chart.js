@@ -106,7 +106,10 @@ Promise.all([
         var d = driverNames.get(v[0])
         return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0]}
     })
-    //console.log(data)
+
+    //array to store all the dots, can be used for making the connecting lines?
+    // notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
+    var dotArr = []
 
     var dots = svg.selectAll("dot")
         .data(data)
@@ -117,6 +120,7 @@ Promise.all([
         .attr("r", 5)
         .attr("fill", d => scaleColor(d.name))
 
+    dotArr.push(dots)
     /*
     var lines = svg.selectAll("path")
         .data(data)
@@ -166,6 +170,8 @@ Promise.all([
             .attr("r", 5)
             .attr("fill", d => scaleColor(d.name))
 
+        dotArr.push(dots)
+
         /* add lines later
         lines = svg.selectAll("path")
             .data(data)
@@ -180,6 +186,8 @@ Promise.all([
     
     
     }
+
+    console.log(dotArr[0]._groups[0][0].cx.baseVal.value)
 
     //toggle button to filter out drivers with 0 points
     /*PROBLEM WITH BUTTON, only removes from most recent year(2020)? Possibly because of using a
