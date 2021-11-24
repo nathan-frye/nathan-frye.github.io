@@ -21,7 +21,7 @@ Promise.all([
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
-        .style("visibility", "visible")
+        .style("opacity", 1)
         .style("z-index", "10")
         .style("background-color", "#545454")
         .style("color", "white")
@@ -29,7 +29,7 @@ Promise.all([
         .style("box-shadow", "2px 2px 3px black")
         .style("text-align", "center")
         .style("justify-content", "center")
-        .text("Mouse over a dot or line for more info")
+        .text("Mouse over a dot or line for more info, a dot will show points value")
 
     var svg = d3.select("#chart")
                 .style("width", dimensions.width)
@@ -133,8 +133,9 @@ Promise.all([
         .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
+        .attr("name2", d=> d.points)
         .on('mouseover', function(){
-            highLight(d3.select(this))
+            highLight(d3.select(this), 1)
         })
         .on('mouseout', function(){
             unHighLight(d3.select(this))
@@ -180,20 +181,13 @@ Promise.all([
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
+            .attr("name2", d=> d.points)
             .on("mouseover", function(d){
-                highLight(d3.select(this))
+                highLight(d3.select(this), 1)
             })
             .on("mouseout", function(){
                 unHighLight(d3.select(this))
-                return tooltip.style("visibility", "hidden")
             })
-            .on('mousemove', function(){
-                tooltip
-                    .style('left', d3.event.pageX + 10 + 'px')
-                    .style('top', d3.event.pageY + 10 + 'px')
-            })
-
-
 
         dotArr.push(dots)    
     }
@@ -243,7 +237,7 @@ Promise.all([
                         .attr("y2", targetY)
                         .attr("name", currName)
                         .on('mouseover', function(){
-                            highLight(d3.select(this))
+                            highLight(d3.select(this), 0)
                         })
                         .on('mouseout', function(){
                             unHighLight(d3.select(this))
@@ -259,14 +253,31 @@ Promise.all([
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
       the graph.
     */
-    function highLight(theName){
+    function highLight(theName, isDot, tempPoints){
         //pull out the name of driver to be highlighted
         var tempName = theName._groups[0][0].attributes.name.textContent
 
         //display the name in the tooltip
-        tooltip
-        .text(String(tempName))
-        .style("visibility", "visible")
+        const[x,y] = d3.pointer(event)
+
+        if(isDot == 1){
+            tooltip
+            .transition()
+            .duration(200)
+            .text(String(tempName) + " Points: " + theName._groups[0][0].attributes.name2.textContent)
+            .style("opacity", 1)
+            .style("left", (x) + "px")
+            .style("top", (y + 50) + "px")    
+        }
+        else if(isDot == 0){
+            tooltip
+            .transition()
+            .duration(200)
+            .text(String(tempName))
+            .style("opacity", 1)
+            .style("left", (x) + "px")
+            .style("top", (y + 50) + "px")    
+        }
 
 
         //loop through years
@@ -294,11 +305,11 @@ Promise.all([
         //pull out the name of driver to be set to normal
         var tempName = theName._groups[0][0].attributes.name.textContent
 
-        //remove the name in the tooltip
-        tooltip
-            .style("visibility", "visible")
-            .text("Mouse over a dot or line for more info")
-
+        //remove tooltip
+        tooltip.transition()
+        .duration(500)
+        .style("opacity", 0)
+        
         //loop through years
         for(var i = 0; i <= 30; i++){
             //loop through drivers in year i
@@ -354,9 +365,9 @@ Promise.all([
     **-Better Colors --------------------------------------------------------------------------------------- INCOMPLETE
     **  -Right now colors get repeated in the same year and individuals get lost, need a unique color for each driver?
     **
-    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ------------- IN PROGRESS
-    **  -Mouseover will also bring up a popup with driver name (and points as well if a dot?)
-    **  -Mayber other info?
+    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ------ Partially complete
+    **  -Mouseover will also bring up a popup with driver name - DONE
+    **  -Mayber other info? Can add a variable to determine if a dot and show how many points?
     **  -Make other unhighlighted data darker/smaller
     **
     **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ INCOMPLETE
