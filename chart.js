@@ -29,7 +29,7 @@ Promise.all([
         .style("box-shadow", "2px 2px 3px black")
         .style("text-align", "center")
         .style("justify-content", "center")
-        .text("Mouse over a dot or line for more info, a dot will show points value")
+        .text("Mouse over a dot or line for more info. \n A dot will show extra information.")
 
     var svg = d3.select("#chart")
                 .style("width", dimensions.width)
@@ -389,10 +389,10 @@ Promise.all([
     **-Better Colors --------------------------------------------------------------------------------------- INCOMPLETE
     **  -Right now colors get repeated in the same year and individuals get lost, need a unique color for each driver?
     **
-    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ------ Partially complete
+    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ---------------- COMPLETE
     **  -Mouseover will also bring up a popup with driver name - DONE
-    **  -Mayber other info? Can add a variable to determine if a dot and show how many points?
-    **  -Make other unhighlighted data darker/smaller
+    **  -Mayber other info? Can add a variable to determine if a dot and show how many points? - DONE
+    **  -Make other unhighlighted data darker/smaller - DONE
     **
     **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ INCOMPLETE
     **  -Graph is crowded, may need to have ability to clear it up, not super necessary right now
