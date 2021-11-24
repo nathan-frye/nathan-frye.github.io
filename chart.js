@@ -21,7 +21,7 @@ Promise.all([
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
-        .style("opacity", 1)
+        .style("opacity", 0)
         .style("z-index", "10")
         .style("background-color", "#545454")
         .style("color", "white")
@@ -29,11 +29,13 @@ Promise.all([
         .style("box-shadow", "2px 2px 3px black")
         .style("text-align", "center")
         .style("justify-content", "center")
-        .text("Mouse over a dot or line for more info. \n A dot will show extra information.")
+        .text("Default")
 
+    //style for the chart
     var svg = d3.select("#chart")
                 .style("width", dimensions.width)
                 .style("height", dimensions.height)
+
 
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
@@ -85,10 +87,39 @@ Promise.all([
             //.attr("dy", ".1em")
             //.attr("transform", "rotate(-65)")
 
+    //x axis label
+    svg.append("text")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 70) + ")")
+        .style("text-anchor", "middle")
+        .text("Year (season)")
+
+    //graph information for easier user experience
+    svg.append("text")
+    .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
+    .style("text-anchor", "middle")
+    .text("*Each line (and connecting dot) in this graph represents a driver that competed in the Formula 1 racing series over some of the years shown in this graph.")
+
+    //graph information for easier user experience 2.0
+    svg.append("text")
+    .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
+    .style("text-anchor", "middle")
+    .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
+
+
+
     var yAxis = svg.append("g")
-                    .call(yAxisgen)
-                    .style("transform", `translateX(${dimensions.margin.left}px)`)
-    
+                .call(yAxisgen)
+                .style("transform", `translateX(${dimensions.margin.left}px)`)
+
+    //y axis label
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - 5)
+        .attr("x", 0 - 355)
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Percentage of Points Earned Out of Total Points")
+
     //Extract race info for the year (season) we're starting with
     var seasonInfo = races.flatMap(function(v){
         return raceStandings.get(v.raceId)
@@ -352,7 +383,6 @@ Promise.all([
             }
         }        
     }
-
 
     //toggle button to filter out drivers with 0 points
     /*PROBLEM WITH BUTTON, this changes year to year, so should filter out driver with 0 points in 1 year, 
