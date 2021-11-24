@@ -73,8 +73,12 @@ Promise.all([
         .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
     var scaleColor = d3.scaleOrdinal()
-        .domain(labels)
-        .range(d3.schemeCategory10)
+        .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
+            30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43])
+        .range(['#A93226', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#28B463', 
+            '#F1C40F', '#F39C12', '#E67E22', '#D35400', '#ECF0F1', '#BDC3C7', '#839192', '#34495E', '#2C3E50', '#7B241C', '#0E6251', 
+            '#F7DC6F', '#C39BD3', '#808B96', '#515A5A', '#DB7093', '#4A235A', '#1B4F72', '#9A7D0A', '#7B7D7D', '#FFF8DC', '#DEB887', 
+            '#BC8F8F', '#F4A460', '#DAA520', '#CD853F', '#D2691E', '#A0522D', '#2F4F4F', '#FF1493', '#90EE90', '#808000', '#7CFC00',])
 
     var xAxisgen = d3.axisBottom().scale(xScale)
     var yAxisgen = d3.axisLeft().scale(yScale)
@@ -82,10 +86,6 @@ Promise.all([
     var xAxis = svg.append("g")
         .call(xAxisgen)
         .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
-        //.selectAll("text")
-            //.attr("dx", "-4em")
-            //.attr("dy", ".1em")
-            //.attr("transform", "rotate(-65)")
 
     //x axis label
     svg.append("text")
