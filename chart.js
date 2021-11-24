@@ -134,6 +134,7 @@ Promise.all([
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
+        .attr("name3", d => (d.points / totForyear) * 100)
         .on('mouseover', function(){
             highLight(d3.select(this), 1)
         })
@@ -181,7 +182,8 @@ Promise.all([
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
-            .attr("name2", d=> d.points)
+            .attr("name2", d => d.points)
+            .attr("name3", d => (d.points / totForyear) * 100)
             .on("mouseover", function(d){
                 highLight(d3.select(this), 1)
             })
@@ -230,7 +232,7 @@ Promise.all([
                     //console.log(sourceX + " " + sourceY + " " + targetX + " " + targetY)
                     edge = svg.append("line")
                         .attr("stroke", scaleColor(currName)) //scaleColor(currName) use once working
-                        .attr("stroke-width", 1)
+                        .attr("stroke-width", 1.5)
                         .attr("x1", sourceX)
                         .attr("y1", sourceY)
                         .attr("x2", targetX)
@@ -253,7 +255,7 @@ Promise.all([
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
       the graph.
     */
-    function highLight(theName, isDot, tempPoints){
+    function highLight(theName, isDot){
         //pull out the name of driver to be highlighted
         var tempName = theName._groups[0][0].attributes.name.textContent
 
@@ -261,13 +263,16 @@ Promise.all([
         const[x,y] = d3.pointer(event)
 
         if(isDot == 1){
+            var tempPoints = theName._groups[0][0].attributes.name2.textContent
+            var tempPerc = theName._groups[0][0].attributes.name3.textContent
+            tempPerc = tempPerc.substring(0, 4)
             tooltip
             .transition()
             .duration(200)
-            .text(String(tempName) + " Points: " + theName._groups[0][0].attributes.name2.textContent)
+            .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
             .style("opacity", 1)
-            .style("left", (x) + "px")
-            .style("top", (y + 50) + "px")    
+            .style("left", (x + 300) + "px")
+            .style("top", (y + 30) + "px")    
         }
         else if(isDot == 0){
             tooltip
@@ -275,7 +280,7 @@ Promise.all([
             .duration(200)
             .text(String(tempName))
             .style("opacity", 1)
-            .style("left", (x) + "px")
+            .style("left", (x + 300) + "px")
             .style("top", (y + 50) + "px")    
         }
 
@@ -288,13 +293,25 @@ Promise.all([
                 if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
                     dotArr[i]._groups[0][k].attributes.r.value = 8
                 }
+                //else make them smaller!
+                else{
+                    dotArr[i]._groups[0][k].attributes.r.value = 1
+                }
             }
+        }
+
+        //make the specifically hovered over dot largest
+        if(isDot == 1){
+            theName._groups[0][0].attributes.r.value = 12
         }
 
         //do it all again for lines
         for(var i = 0; i < lines.length; i++){
             if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
                 lines[i]._groups[0][0].attributes[1].value = 5
+            }
+            else{
+                lines[i]._groups[0][0].attributes[1].value = 0.2
             }
         }
     }
@@ -314,8 +331,12 @@ Promise.all([
         for(var i = 0; i <= 30; i++){
             //loop through drivers in year i
             for(var k = 0; k < dotArr[i]._groups[0].length; k++){
-                //if find the name, change the attribute for r to 8 making the dot larger
+                //if find the name, change the attribute for r to 3 making the dot the regular size
                 if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
+                    dotArr[i]._groups[0][k].attributes.r.value = 3
+                }
+                //make larger again
+                else{
                     dotArr[i]._groups[0][k].attributes.r.value = 3
                 }
             }
@@ -324,7 +345,10 @@ Promise.all([
         //do it all again for lines
         for(var i = 0; i < lines.length; i++){
             if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
-                lines[i]._groups[0][0].attributes[1].value = 1
+                lines[i]._groups[0][0].attributes[1].value = 1.5
+            }
+            else{
+                lines[i]._groups[0][0].attributes[1].value = 1.5
             }
         }        
     }
