@@ -17,7 +17,19 @@ Promise.all([
         }
     }
 
-    //console.log(dataset)
+    //Need this for showing the name and other information when mousing over a line/dot
+    var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("visibility", "visible")
+        .style("z-index", "10")
+        .style("background-color", "#545454")
+        .style("color", "white")
+        .style("border-radius", "4px")
+        .style("box-shadow", "2px 2px 3px black")
+        .style("text-align", "center")
+        .style("justify-content", "center")
+        .text("Mouse over a dot or line for more info")
 
     var svg = d3.select("#chart")
                 .style("width", dimensions.width)
@@ -168,11 +180,17 @@ Promise.all([
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
-            .on('mouseover', function(){
+            .on("mouseover", function(d){
                 highLight(d3.select(this))
             })
-            .on('mouseout', function(){
+            .on("mouseout", function(){
                 unHighLight(d3.select(this))
+                return tooltip.style("visibility", "hidden")
+            })
+            .on('mousemove', function(){
+                tooltip
+                    .style('left', d3.event.pageX + 10 + 'px')
+                    .style('top', d3.event.pageY + 10 + 'px')
             })
 
 
@@ -236,20 +254,20 @@ Promise.all([
             }
         }
     }
-
+        
     /*When mousing over a dot or line, use its attribute "name" to find all of the corresponding
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
       the graph.
     */
-    //console.log(dotArr[20]._groups[0][0].attributes)
-    console.log(lines[0]._groups[0][0].attributes)
-
     function highLight(theName){
-
         //pull out the name of driver to be highlighted
         var tempName = theName._groups[0][0].attributes.name.textContent
-        //console.log(theName._groups[0][0].attributes.name.textContent)
-        //console.log(tempName)
+
+        //display the name in the tooltip
+        tooltip
+        .text(String(tempName))
+        .style("visibility", "visible")
+
 
         //loop through years
         for(var i = 0; i <= 30; i++){
@@ -263,11 +281,9 @@ Promise.all([
         }
 
         //do it all again for lines
-        //loop through the lines
         for(var i = 0; i < lines.length; i++){
             if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
                 lines[i]._groups[0][0].attributes[1].value = 5
-                //console.log(lines[i]._groups[0][0].attributes.stroke-width.value)
             }
         }
     }
@@ -275,10 +291,13 @@ Promise.all([
     /*Opposite of highLight, returns the dots and lines to normal
     */
     function unHighLight(theName){
-        //pull out the name of driver to be highlighted
+        //pull out the name of driver to be set to normal
         var tempName = theName._groups[0][0].attributes.name.textContent
-        //console.log(theName._groups[0][0].attributes.name.textContent)
-        //console.log(tempName)
+
+        //remove the name in the tooltip
+        tooltip
+            .style("visibility", "visible")
+            .text("Mouse over a dot or line for more info")
 
         //loop through years
         for(var i = 0; i <= 30; i++){
@@ -292,11 +311,9 @@ Promise.all([
         }
 
         //do it all again for lines
-        //loop through the lines
         for(var i = 0; i < lines.length; i++){
             if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
                 lines[i]._groups[0][0].attributes[1].value = 1
-                //console.log(lines[i]._groups[0][0].attributes.stroke-width.value)
             }
         }        
     }
@@ -305,7 +322,7 @@ Promise.all([
     //toggle button to filter out drivers with 0 points
     /*PROBLEM WITH BUTTON, this changes year to year, so should filter out driver with 0 points in 1 year, 
       but not their other years, or only remove that driver for the one year they have 0 points, but what
-      about the lines? This also needs to change and use dotArr and lines, becuase this implementation only
+      about the lines? This also needs to change and use dotArr and lines arrays, becuase this implementation only
       affects the last year (2020) due to using a loop to create the dots
     *
     var boolFilter = 0
@@ -340,9 +357,10 @@ Promise.all([
     **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ------------- IN PROGRESS
     **  -Mouseover will also bring up a popup with driver name (and points as well if a dot?)
     **  -Mayber other info?
+    **  -Make other unhighlighted data darker/smaller
     **
     **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ INCOMPLETE
-    **  -Graph is crowded, may need to have ability to clear it up, depending on if highlighting works well or not
+    **  -Graph is crowded, may need to have ability to clear it up, not super necessary right now
     **
     **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
     **  -Clicking dot or line will be used to select the driver for a secondary visualization
