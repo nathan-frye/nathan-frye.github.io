@@ -72,6 +72,7 @@ Promise.all([
         .domain([0, 35])
         .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
+    //Expanded color scale to reduce the amound of overlap in colors. Need over double for actual unique colors?
     var scaleColor = d3.scaleOrdinal()
         .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
             30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43])
@@ -104,8 +105,6 @@ Promise.all([
     .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
     .style("text-anchor", "middle")
     .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
-
-
 
     var yAxis = svg.append("g")
                 .call(yAxisgen)
@@ -180,7 +179,6 @@ Promise.all([
     for(var i = 1; i <= 30; i++){
         races = years.get(String(labels[i]))
 
-        //Extract race info for the year (season) we're working with
         seasonInfo = races.flatMap(function(v){
             return raceStandings.get(v.raceId)
         })
@@ -242,7 +240,7 @@ Promise.all([
         //loop through drivers in a year i
         for(var k = 0; k < dotArr[i]._groups[0].length; k++){
 
-            //pull out specific name, and find it in the next year
+            //pull out specific name too search for in the next year
             currName = dotArr[i]._groups[0][k].attributes[4].textContent
 
             //set source x and y from current driver
@@ -260,9 +258,8 @@ Promise.all([
                     targetY = dotArr[i + 1]._groups[0][j].cy.baseVal.value
 
                     //draw the line
-                    //console.log(sourceX + " " + sourceY + " " + targetX + " " + targetY)
                     edge = svg.append("line")
-                        .attr("stroke", scaleColor(currName)) //scaleColor(currName) use once working
+                        .attr("stroke", scaleColor(currName))
                         .attr("stroke-width", 1.5)
                         .attr("x1", sourceX)
                         .attr("y1", sourceY)
