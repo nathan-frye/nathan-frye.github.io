@@ -40,18 +40,11 @@ Promise.all([
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
 
-    //create array of just the years for the dropdown
-    var yearsOnly=[];
-    for(var i = 1950; i <= 2020; i++){
-        yearsOnly.push(i)
-    }
-
+    //years that will be used in the visualization
     var yearsRange=[];
     for(var i = 1990; i <=2020; i++){
         yearsRange.push(i)
     }
-
-    var startYear = "1990"
 
     //Extract exact year (season) we're starting with
     var races = years.get("1990")
@@ -59,13 +52,13 @@ Promise.all([
     //Group data by raceId
     var raceStandings = d3.group(dataset[2], d=>d.raceId)
 
+    //Labels for the x-axis
     var labels = yearsRange;
 
     //set up x and y axis
     var xScale = d3.scaleBand()
         .domain(labels)
         .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-        //.padding(0.2)
 
     //using 30 for max percent temp
     var yScale = d3.scaleLinear()
@@ -81,9 +74,15 @@ Promise.all([
             '#F7DC6F', '#C39BD3', '#808B96', '#515A5A', '#DB7093', '#4A235A', '#1B4F72', '#9A7D0A', '#7B7D7D', '#FFF8DC', '#DEB887', 
             '#BC8F8F', '#F4A460', '#DAA520', '#CD853F', '#D2691E', '#A0522D', '#2F4F4F', '#FF1493', '#90EE90', '#808000', '#7CFC00',])
 
+    //For a filter to only show drivers that have won a championship
+    var champList = ['Ayrton Senna', 'Nigel Mansell', 'Alain Prost', 'Michael Schumacher', 'Damon Hill', 'Jacques Villeneuve', 'Mika Häkkinen', 
+        'Fernando Alonso', 'Kimi Räikkönen', 'Lewis Hamilton', 'Jenson Button', 'Sebastian Vettel', 'Nico Rosberg']
+
+    //axis generator
     var xAxisgen = d3.axisBottom().scale(xScale)
     var yAxisgen = d3.axisLeft().scale(yScale)
 
+    //initialize the x-axis
     var xAxis = svg.append("g")
         .call(xAxisgen)
         .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
@@ -106,6 +105,7 @@ Promise.all([
     .style("text-anchor", "middle")
     .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
 
+    //initialize the y axis
     var yAxis = svg.append("g")
                 .call(yAxisgen)
                 .style("transform", `translateX(${dimensions.margin.left}px)`)
@@ -154,6 +154,7 @@ Promise.all([
     //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
     var dotArr = []
 
+    //creating the dots for the first year
     var dots = svg.selectAll("dot")
         .data(data)
         .enter()
@@ -281,16 +282,17 @@ Promise.all([
         
     /*When mousing over a dot or line, use its attribute "name" to find all of the corresponding
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
-      the graph.
+      the graph. It also checks to make sure that the dot isn't hidden by the filters.
     */
     function highLight(theName, isDot){
         //pull out the name of driver to be highlighted
         var tempName = theName._groups[0][0].attributes.name.textContent
 
-        //display the name in the tooltip
+        //keeps track of the mouse position
         const[x,y] = d3.pointer(event)
 
-        if(isDot == 1){
+        //Show the information relating to a dot
+        if(isDot == 1 && theName._groups[0][0].attributes.r.value != 0){
             var tempPoints = theName._groups[0][0].attributes.name2.textContent
             var tempPerc = theName._groups[0][0].attributes.name3.textContent
             tempPerc = tempPerc.substring(0, 4)
@@ -302,7 +304,8 @@ Promise.all([
             .style("left", (x + 300) + "px")
             .style("top", (y + 30) + "px")    
         }
-        else if(isDot == 0){
+        //Show only the name if it is a line
+        else if(isDot == 0 && theName._groups[0][0].attributes[1].value != 0){
             tooltip
             .transition()
             .duration(200)
@@ -318,11 +321,11 @@ Promise.all([
             //loop through drivers in year i
             for(var k = 0; k < dotArr[i]._groups[0].length; k++){
                 //if find the name, change the attribute for r to 8 making the dot larger
-                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
+                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
                     dotArr[i]._groups[0][k].attributes.r.value = 8
                 }
                 //else make them smaller!
-                else{
+                else if(dotArr[i]._groups[0][k].attributes.r.value != 0){
                     dotArr[i]._groups[0][k].attributes.r.value = 1
                 }
             }
@@ -335,16 +338,16 @@ Promise.all([
 
         //do it all again for lines
         for(var i = 0; i < lines.length; i++){
-            if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
+            if(lines[i]._groups[0][0].attributes[6].textContent == tempName && lines[i]._groups[0][0].attributes[1].value != 0){
                 lines[i]._groups[0][0].attributes[1].value = 5
             }
-            else{
+            else if(lines[i]._groups[0][0].attributes[1].value != 0){
                 lines[i]._groups[0][0].attributes[1].value = 0.2
             }
         }
     }
 
-    /*Opposite of highLight, returns the dots and lines to normal
+    /*Opposite of highLight, returns the dots and lines to normal unless they are hidden.
     */
     function unHighLight(theName){
         //pull out the name of driver to be set to normal
@@ -359,12 +362,8 @@ Promise.all([
         for(var i = 0; i <= 30; i++){
             //loop through drivers in year i
             for(var k = 0; k < dotArr[i]._groups[0].length; k++){
-                //if find the name, change the attribute for r to 3 making the dot the regular size
-                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName){
-                    dotArr[i]._groups[0][k].attributes.r.value = 3
-                }
                 //make larger again
-                else{
+                if(dotArr[i]._groups[0][k].attributes.r.value != 0){
                     dotArr[i]._groups[0][k].attributes.r.value = 3
                 }
             }
@@ -372,43 +371,65 @@ Promise.all([
 
         //do it all again for lines
         for(var i = 0; i < lines.length; i++){
-            if(lines[i]._groups[0][0].attributes[6].textContent == tempName){
-                lines[i]._groups[0][0].attributes[1].value = 1.5
-            }
-            else{
+            if(lines[i]._groups[0][0].attributes[1].value != 0){
                 lines[i]._groups[0][0].attributes[1].value = 1.5
             }
         }        
     }
 
-    //toggle button to filter out drivers with 0 points
-    /*PROBLEM WITH BUTTON, this changes year to year, so should filter out driver with 0 points in 1 year, 
-      but not their other years, or only remove that driver for the one year they have 0 points, but what
-      about the lines? This also needs to change and use dotArr and lines arrays, becuase this implementation only
-      affects the last year (2020) due to using a loop to create the dots
-    *
-    var boolFilter = 0
-    d3.select("#tog0").on('click', function(){
-        //filter off, turning on
-        if(boolFilter == 0){
-            boolFilter = 1
-            //console.log("turning filter on")
-            dots.transition().duration(0)
-                .attr("r", d => {
-                    if(d.points == 0)
-                        return 0
-                    return 5
-                })
+    //Button to display only drivers which have won a championship
+    d3.select("#champs").on('click', function(){
+        var isChamp = 0
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //loop through list of champions, to see if the name is there
+                for(var j = 0; j < 13; j++){
+                    if(dotArr[i]._groups[0][k].attributes[4].textContent == champList[j]){
+                        isChamp = 1
+                    }
+                }
+                //if driver is not a champion, make the dot invisible
+                if(isChamp == 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 0
+                }
+                //set isChamp to zero for next driver
+                isChamp = 0
+            }
         }
-        //filter on, turning off
-        else{
-            boolFilter = 0
-            //console.log("turning filter off")
-            dots.transition().duration(0)
-                .attr("r", 5)
-        }
+
+        isChamp = 0
+        //do the same for the lines
+        for(var i = 0; i < lines.length; i++){
+            for(var j = 0; j < 13; j++){
+                if(lines[i]._groups[0][0].attributes[6].textContent == champList[j]){
+                    isChamp = 1
+                }
+            }
+            if(isChamp == 0){
+                lines[i]._groups[0][0].attributes[1].value = 0
+            }
+            isChamp = 0
+        }        
+
     })
-    */
+
+    //Button to reset graph
+    d3.select("#reset").on('click', function(){
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                dotArr[i]._groups[0][k].attributes.r.value = 3
+            }
+        }
+
+        //do it all again for lines
+        for(var i = 0; i < lines.length; i++){
+            lines[i]._groups[0][0].attributes[1].value = 1.5
+        }        
+    })
 
     /******************************************************************************************************************
     ** NEED TO DO:
@@ -421,15 +442,28 @@ Promise.all([
     **  -Mayber other info? Can add a variable to determine if a dot and show how many points? - DONE
     **  -Make other unhighlighted data darker/smaller - DONE
     **
-    **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ INCOMPLETE
+    **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ NEED MORE?
     **  -Graph is crowded, may need to have ability to clear it up, not super necessary right now
+    **  -Button to show only drivers who have won a championship - DONE
+    **  -Maybe something like, find out which top % of the drivers have the most points? Find out sum of percentage
+    **      achieved for each driver over their career (this can go over 100% since is a sum) and then show the top
+    **      10 or something?
     **
     **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
     **  -Clicking dot or line will be used to select the driver for a secondary visualization
     **      -What information will this secondary vis have? Will be in a separate svg underneath or on the side.
     **          -Single season? Name, teammate, teamname(i.e. ferrari), points scored that season
     **          -Career? Name, similar to first graph but only the single driver? Total lifetime points
-    **
+    **      -Idea: Ability to click a driver in first vis, and add them to secondary vis, allowing a user to pick just
+    **          the drivers that they want, and display the info in the same way?
+    **      -Idea: Clicking a dot will give information specific to that driver and year. Like teammate, team name
+    **          same points, and points percentage. Mayybe info specific to each race in that season?
+    **          Does it have to be a fancy chart or can it be something like:
+    **          Name:       "xxx"
+    **          Year:       "xxx"
+    **          Team:       "xxx"
+    **          Teammate:   "xxx"
+    **          -Perhaps it could just be beside the first graph?
     *///***************************************************************************************************************
 
 
