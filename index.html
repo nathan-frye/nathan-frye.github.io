@@ -8,7 +8,7 @@
       
       svg
       {
-        display: block;
+        display: inline-block;
         margin: auto;
       }
 
@@ -38,6 +38,17 @@
 
       section div{
         display: inline-block;
+        font-size: 16px;
+      }
+
+      section div div{
+        margin-top: 0px;
+        display: block;
+      }
+
+      button{
+        margin-top: 5px;
+        margin-bottom: 0px;
       }
 
       ul{
@@ -85,11 +96,15 @@
     </header>
 
     <section>
-      <svg style="display: inline-block;" id="chart"></svg>
+      <svg id="chart"></svg>
+      <div id="menu">
+        <div>
+          <button id="champs">Champions Only</button>
+          <button id="reset">Reset</button>
+          <button id="clear">Clear</button>
+        </div>
+      </div>
       <script type="module" src="chart.js"></script>
-      
-      <button id="champs">Champions Only</button>
-      <button id="reset">Reset</button>
     </section>
 
   </body>

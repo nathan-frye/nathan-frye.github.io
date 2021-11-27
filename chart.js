@@ -391,6 +391,7 @@ Promise.all([
     //Button to display only drivers which have won a championship
     d3.select("#champs").on('click', function(){
         resetChart()
+        clearSelections()
         var isChamp = 0
         //loop through years
         for(var i = 0; i <= 30; i++){
@@ -400,6 +401,10 @@ Promise.all([
                 for(var j = 0; j < 13; j++){
                     if(dotArr[i]._groups[0][k].attributes[4].textContent == champList[j]){
                         isChamp = 1
+                        if(!(secondarySelectedDrivers.includes(champList[j])))
+                        {
+                            secondarySelectedDrivers.push(champList[j])
+                        }
                     }
                 }
                 //if driver is not a champion, make the dot invisible
@@ -423,18 +428,19 @@ Promise.all([
                 lines[i]._groups[0][0].attributes[1].value = 0
             }
             isChamp = 0
-        } 
-        
-        populateList()
-        resetSelections()
-
+        }
+        champSelections()
     })
 
     //Button to reset graph
     d3.select("#reset").on('click', function(){
       resetChart()
-      populateList()
       resetSelections()
+    })
+
+    d3.select("#clear").on('click', function(){
+        clearSelections()
+        displaySelectedDrivers()
     })
 
     //Reset the chart display
@@ -454,15 +460,9 @@ Promise.all([
         }  
     }
 
-    /*var secondaryDrivers = d3.group(dataset[0], d => d.driverId)
-    var secondaryNames = Array.from(secondaryDrivers, function(v){
-        var d = secondaryDrivers.get(v[0])
-        return d[0].forename + " " + d[0].surname
-    })*/
-
     //Sort the names alphabetically and create another array to store user selections
     secondaryNames.sort()
-    var secondarySelectedDrivers = Array()
+    var secondarySelectedDrivers = Array.from(secondaryNames)
 
     //console.log(secondaryNames)
 
@@ -476,13 +476,14 @@ Promise.all([
         list.innerHTML = ""
 
         //Find HTML body by tag name and append our div element to it and our list to our div
-        document.getElementsByTagName('section')[0].appendChild(div)
+        document.getElementById("menu").appendChild(div)
         div.appendChild(list)
 
         //Loop through each name and append it to the list
         for(var i = 0; i < secondaryNames.length; ++i)
         {
             var row = document.createElement('li')
+            row.classList.toggle('checked')
             row.innerHTML = secondaryNames[i]
             list.appendChild(row)
         }
@@ -555,10 +556,61 @@ Promise.all([
         }   
     }
 
+    //Run through list and highlight all champions
+    function champSelections()
+    {
+        console.log(secondarySelectedDrivers)
+        var d = document.getElementsByTagName('li')
+        secondarySelectedDrivers.sort()
+        champList.sort()
+        var i = 0
+        var j = 0
+        while(j < secondarySelectedDrivers.length)
+        {
+            while(i < d.length)
+            {
+                console.log(secondarySelectedDrivers[j])
+                console.log(d[i].innerHTML)
+                if(d[i].innerHTML == secondarySelectedDrivers[j])
+                {
+                    d[i].classList.add('checked')
+                    i++
+                    break
+                }
+                else
+                {
+                    d[i].classList.remove('checked')
+                }
+                i++
+            }
+            j++
+        }
+    }
+
     //Reset the user selections
     function resetSelections()
     {
+        secondarySelectedDrivers = Array.from(secondaryNames)
+        var d = document.getElementsByTagName('li')
+        var i = 0
+        while(i < d.length)
+        {
+            d[i].classList.add('checked')
+            i++
+        }
+    }
+
+    //Clear the user selections
+    function clearSelections()
+    {
         secondarySelectedDrivers = []
+        var d = document.getElementsByTagName('li')
+        var i = 0
+        while(i < d.length)
+        {
+            d[i].classList.remove('checked')
+            i++
+        }
     }
 
     /******************************************************************************************************************
