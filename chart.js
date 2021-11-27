@@ -139,6 +139,7 @@ Promise.all([
 
     //Map all driver info to driverId (aka surname and forename)
     var driverNames = d3.group(dataset[0], d => d.driverId)
+    console.log(driverNames)
     
     //Convert driverPoints into an array
     var temp = Array.from(driverPoints)
@@ -214,8 +215,9 @@ Promise.all([
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
             .attr("name3", d => (d.points / totForyear) * 100)
-            .on("mouseover", function(d){
+            .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
+                console.log(i)
             })
             .on("mouseout", function(){
                 unHighLight(d3.select(this))
@@ -236,6 +238,9 @@ Promise.all([
     var edge
     var lines = []
 
+    //We store the names of all drivers displayed on the chart here
+    var secondaryNames = []
+
     //loop through years
     for(var i = 0; i < 30; i++){
         //loop through drivers in a year i
@@ -253,7 +258,11 @@ Promise.all([
 
                 //find same driver if they are in that year
                 if(dotArr[i + 1]._groups[0][j].attributes[4].textContent == currName){
-                    
+                    //If found and not already stored, store the name
+                    if(!(secondaryNames.includes(currName)))
+                    {
+                        secondaryNames.push(currName)
+                    }
                     //set target x and y from current driver from the next year
                     targetX = dotArr[i + 1]._groups[0][j].cx.baseVal.value
                     targetY = dotArr[i + 1]._groups[0][j].cy.baseVal.value
@@ -279,6 +288,8 @@ Promise.all([
             }
         }
     }
+
+    console.log(secondaryNames)
         
     /*When mousing over a dot or line, use its attribute "name" to find all of the corresponding
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
@@ -379,6 +390,8 @@ Promise.all([
 
     //Button to display only drivers which have won a championship
     d3.select("#champs").on('click', function(){
+        resetChart()
+        clearSelections()
         var isChamp = 0
         //loop through years
         for(var i = 0; i <= 30; i++){
@@ -388,6 +401,10 @@ Promise.all([
                 for(var j = 0; j < 13; j++){
                     if(dotArr[i]._groups[0][k].attributes[4].textContent == champList[j]){
                         isChamp = 1
+                        if(!(secondarySelectedDrivers.includes(champList[j])))
+                        {
+                            secondarySelectedDrivers.push(champList[j])
+                        }
                     }
                 }
                 //if driver is not a champion, make the dot invisible
@@ -411,12 +428,24 @@ Promise.all([
                 lines[i]._groups[0][0].attributes[1].value = 0
             }
             isChamp = 0
-        }        
-
+        }
+        champSelections()
     })
 
     //Button to reset graph
     d3.select("#reset").on('click', function(){
+      resetChart()
+      resetSelections()
+    })
+
+    d3.select("#clear").on('click', function(){
+        clearSelections()
+        displaySelectedDrivers()
+    })
+
+    //Reset the chart display
+    function resetChart()
+    {
         //loop through years
         for(var i = 0; i <= 30; i++){
             //loop through drivers in year i
@@ -428,8 +457,161 @@ Promise.all([
         //do it all again for lines
         for(var i = 0; i < lines.length; i++){
             lines[i]._groups[0][0].attributes[1].value = 1.5
-        }        
+        }  
+    }
+
+    //Sort the names alphabetically and create another array to store user selections
+    secondaryNames.sort()
+    var secondarySelectedDrivers = Array.from(secondaryNames)
+
+    //console.log(secondaryNames)
+
+    //Create HTML elements to store the names
+    var div = document.createElement('div')
+    var list = document.createElement('ul')
+
+    //Create the list displayed next to the graph
+    function populateList()
+    {
+        list.innerHTML = ""
+
+        //Find HTML body by tag name and append our div element to it and our list to our div
+        document.getElementById("menu").appendChild(div)
+        div.appendChild(list)
+
+        //Loop through each name and append it to the list
+        for(var i = 0; i < secondaryNames.length; ++i)
+        {
+            var row = document.createElement('li')
+            row.classList.toggle('checked')
+            row.innerHTML = secondaryNames[i]
+            list.appendChild(row)
+        }
+    }
+    populateList()
+
+    //Add a click function to each list element
+    var secondaryCheckList = document.querySelector('ul')
+    secondaryCheckList.addEventListener('click', function(d){
+        if(d.target.tagName === 'LI')
+        {
+            //Adds or removes the "checked" attribute from the HTML <li> elements
+            d.target.classList.toggle('checked')
+            //Remove clicked name from the selection array if it's already selected
+            if(secondarySelectedDrivers.includes(d.target.innerHTML))
+            {
+                var index = secondarySelectedDrivers.indexOf(d.target.innerHTML)
+                if(index != -1)
+                {
+                    secondarySelectedDrivers.splice(index, 1)
+                }
+                displaySelectedDrivers()
+            }
+            //Otherwise, push it to the picked list of names
+            else
+            {
+                secondarySelectedDrivers.push(d.target.innerHTML)
+                console.log(secondarySelectedDrivers)
+                displaySelectedDrivers()
+            }
+        }
     })
+
+    //Reset the graph and display only the selected drivers
+    function displaySelectedDrivers()
+    {
+        resetChart()
+        var isSelected = 0
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //loop through list of champions, to see if the name is there
+                for(var j = 0; j < secondarySelectedDrivers.length; j++){
+                    if(dotArr[i]._groups[0][k].attributes[4].textContent == secondarySelectedDrivers[j]){
+                        isSelected = 1
+                    }
+                }
+                //if driver is not a champion, make the dot invisible
+                if(isSelected == 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 0
+                }
+                //set isChamp to zero for next driver
+                isSelected = 0
+            }
+        }
+
+        isSelected = 0
+        //do the same for the lines
+        for(var i = 0; i < lines.length; i++){
+            for(var j = 0; j < secondarySelectedDrivers.length; j++){
+                if(lines[i]._groups[0][0].attributes[6].textContent == secondarySelectedDrivers[j]){
+                    isSelected = 1
+                }
+            }
+            if(isSelected == 0){
+                lines[i]._groups[0][0].attributes[1].value = 0
+            }
+            isSelected = 0
+        }   
+    }
+
+    //Run through list and highlight all champions
+    function champSelections()
+    {
+        console.log(secondarySelectedDrivers)
+        var d = document.getElementsByTagName('li')
+        secondarySelectedDrivers.sort()
+        champList.sort()
+        var i = 0
+        var j = 0
+        while(j < secondarySelectedDrivers.length)
+        {
+            while(i < d.length)
+            {
+                console.log(secondarySelectedDrivers[j])
+                console.log(d[i].innerHTML)
+                if(d[i].innerHTML == secondarySelectedDrivers[j])
+                {
+                    d[i].classList.add('checked')
+                    i++
+                    break
+                }
+                else
+                {
+                    d[i].classList.remove('checked')
+                }
+                i++
+            }
+            j++
+        }
+    }
+
+    //Reset the user selections
+    function resetSelections()
+    {
+        secondarySelectedDrivers = Array.from(secondaryNames)
+        var d = document.getElementsByTagName('li')
+        var i = 0
+        while(i < d.length)
+        {
+            d[i].classList.add('checked')
+            i++
+        }
+    }
+
+    //Clear the user selections
+    function clearSelections()
+    {
+        secondarySelectedDrivers = []
+        var d = document.getElementsByTagName('li')
+        var i = 0
+        while(i < d.length)
+        {
+            d[i].classList.remove('checked')
+            i++
+        }
+    }
 
     /******************************************************************************************************************
     ** NEED TO DO:
