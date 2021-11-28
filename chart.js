@@ -139,7 +139,7 @@ Promise.all([
 
     //Map all driver info to driverId (aka surname and forename)
     var driverNames = d3.group(dataset[0], d => d.driverId)
-    console.log(driverNames)
+    //console.log(driverNames)
     
     //Convert driverPoints into an array
     var temp = Array.from(driverPoints)
@@ -217,7 +217,7 @@ Promise.all([
             .attr("name3", d => (d.points / totForyear) * 100)
             .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
-                console.log(i)
+                //console.log(i)
             })
             .on("mouseout", function(){
                 unHighLight(d3.select(this))
@@ -289,7 +289,7 @@ Promise.all([
         }
     }
 
-    console.log(secondaryNames)
+    //console.log(secondaryNames)
         
     /*When mousing over a dot or line, use its attribute "name" to find all of the corresponding
       dots and lines and make them larger, so that the driver is more easily distinguishable throughout
@@ -485,6 +485,7 @@ Promise.all([
             var row = document.createElement('li')
             row.classList.toggle('checked')
             row.innerHTML = secondaryNames[i]
+
             list.appendChild(row)
         }
     }
@@ -511,10 +512,63 @@ Promise.all([
             else
             {
                 secondarySelectedDrivers.push(d.target.innerHTML)
-                console.log(secondarySelectedDrivers)
+                //console.log(secondarySelectedDrivers)
                 displaySelectedDrivers()
             }
         }
+    })
+
+    //highlight in graph when mousing over a name in the list
+    secondaryCheckList.addEventListener('mouseover', function(d){
+        var tempName = d.target.innerHTML
+        //make sure it is clicked
+        if(secondarySelectedDrivers.includes(d.target.innerHTML)){
+        //loop through years
+            for(var i = 0; i <= 30; i++){
+                //loop through drivers in year i
+                for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                    //if find the name, change the attribute for r to 8 making the dot larger
+                    if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                        dotArr[i]._groups[0][k].attributes.r.value = 8
+                    }
+                    //else make them smaller!
+                    else if(dotArr[i]._groups[0][k].attributes.r.value != 0){
+                        dotArr[i]._groups[0][k].attributes.r.value = 1
+                    }
+                }
+            }
+
+            //do it all again for lines
+            for(var i = 0; i < lines.length; i++){
+                if(lines[i]._groups[0][0].attributes[6].textContent == tempName && lines[i]._groups[0][0].attributes[1].value != 0){
+                    lines[i]._groups[0][0].attributes[1].value = 5
+                }
+                else if(lines[i]._groups[0][0].attributes[1].value != 0){
+                    lines[i]._groups[0][0].attributes[1].value = 0.2
+                }
+            }
+        }
+    })
+
+    //unhighlight when mouseout from the list
+    secondaryCheckList.addEventListener('mouseout', function(d){
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //make larger again
+                if(dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 3
+                }
+            }
+        }
+
+        //do it all again for lines
+        for(var i = 0; i < lines.length; i++){
+            if(lines[i]._groups[0][0].attributes[1].value != 0){
+                lines[i]._groups[0][0].attributes[1].value = 1.5
+            }
+        }        
     })
 
     //Reset the graph and display only the selected drivers
@@ -559,7 +613,7 @@ Promise.all([
     //Run through list and highlight all champions
     function champSelections()
     {
-        console.log(secondarySelectedDrivers)
+        //console.log(secondarySelectedDrivers)
         var d = document.getElementsByTagName('li')
         secondarySelectedDrivers.sort()
         champList.sort()
@@ -569,8 +623,8 @@ Promise.all([
         {
             while(i < d.length)
             {
-                console.log(secondarySelectedDrivers[j])
-                console.log(d[i].innerHTML)
+                //console.log(secondarySelectedDrivers[j])
+                //console.log(d[i].innerHTML)
                 if(d[i].innerHTML == secondarySelectedDrivers[j])
                 {
                     d[i].classList.add('checked')
@@ -624,7 +678,7 @@ Promise.all([
     **  -Mayber other info? Can add a variable to determine if a dot and show how many points? - DONE
     **  -Make other unhighlighted data darker/smaller - DONE
     **
-    **-Filters to remove some drivers (simple interaction)? ------------------------------------------------ NEED MORE?
+    **-Filters to remove some drivers (simple interaction)? -------------------------------------------------- COMPLETE
     **  -Graph is crowded, may need to have ability to clear it up, not super necessary right now
     **  -Button to show only drivers who have won a championship - DONE
     **  -Maybe something like, find out which top % of the drivers have the most points? Find out sum of percentage
