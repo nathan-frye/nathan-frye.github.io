@@ -191,12 +191,17 @@ Promise.all([
         .enter()
         .append("circle")
         .attr("cx", d => xScale(d.year) + 18)
-        .attr("cy", d => yScale(d.points))
+        .attr("cy", function(d,i) {
+            console.log(i)
+            yScale(i+1)
+        })
         .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
-        .attr("name3", d => d.points)
+        .attr("name3", function(d,i){
+                return i+1
+            })
         .attr("name4", d => d.year)
         .attr("name5", d => d.ID)
         .on('mouseover', function(){
@@ -238,18 +243,27 @@ Promise.all([
             var d = driverNames.get(v[0])
             return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[i], ID: d[0].driverId}
         })
+
+        data.sort(function(d,v){
+            return d3.descending(d.points, v.points)
+        })
     
         dots = svg.selectAll("dot")
             .data(data)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.year) + 18)
-            .attr("cy", d => yScale(d.points))
+            .attr("cy", function(d,i) {
+                console.log(i)
+                return yScale(i+1)
+            })
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
-            .attr("name3", d => d.points)
+            .attr("name3", function(d,i){
+                return i+1
+            })
             .attr("name4", d => d.year)
             .attr("name5", d => d.ID)
             .on("mouseover", function(d, i){
