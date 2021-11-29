@@ -4,6 +4,7 @@ Promise.all([
     d3.csv("driverInfo.csv"),
     d3.csv("raceInfo.csv"),
     d3.csv("results.csv"),
+    d3.csv("constructors.csv"),
 ]).then(function(dataset)
 {
     var dimensions = {
@@ -12,6 +13,17 @@ Promise.all([
         margin: {
             top: 10,
             bottom: 100,
+            right: 10,
+            left: 50
+        }
+    }
+
+    var dimensions2 = {
+        width: 1000,
+        height: 500,
+        margin: {
+            top: 10,
+            bottom: 30,
             right: 10,
             left: 50
         }
@@ -33,9 +45,12 @@ Promise.all([
 
     //style for the chart
     var svg = d3.select("#chart")
-                .style("width", dimensions.width)
-                .style("height", dimensions.height)
+        .style("width", dimensions.width)
+        .style("height", dimensions.height)
 
+    var svg2 = d3.select("#chart2")
+        .style("width", dimensions2.width)
+        .style("height", dimensions2.height)
 
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
@@ -127,6 +142,10 @@ Promise.all([
     //Tie the driverID to the total points earned by that driver for the year (season)
     var driverPoints = d3.rollup(seasonInfo, v => d3.sum(v, d => d.points), d => d.driverId)
 
+    //Tie result to constructor id
+    var driverConstructor = d3.group(seasonInfo, d => d.constructorId)
+    //console.log(driverConstructor)
+
     //Make an array of total points earned for y-axis
     var points = Array.from(driverPoints.values())
 
@@ -143,11 +162,19 @@ Promise.all([
     
     //Convert driverPoints into an array
     var temp = Array.from(driverPoints)
+    //console.log(temp)
+
+    //same for driverConstructor
+    var temp2 = Array.from(driverConstructor)
+    //console.log(seasonInfo)
+
+
 
     //Map full driver names to their total points earned for the year (season)
     var data = temp.map(function(v){
         var d = driverNames.get(v[0])
-        return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0]}
+        //console.log(d)
+        return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0], ID: d[0].driverId}
     })
 
     //array to store all the dots, used later for making the connecting lines
@@ -167,8 +194,13 @@ Promise.all([
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
         .attr("name3", d => (d.points / totForyear) * 100)
+        .attr("name4", d => d.year)
+        .attr("name5", d => d.ID)
         .on('mouseover', function(){
             highLight(d3.select(this), 1)
+        })
+        .on('click', function(d,i){
+            displayDot(d3.select(this))
         })
         .on('mouseout', function(){
             unHighLight(d3.select(this))
@@ -201,7 +233,7 @@ Promise.all([
         
         data = temp.map(function(v){
             var d = driverNames.get(v[0])
-            return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[i]}
+            return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[i], ID: d[0].driverId}
         })
     
         dots = svg.selectAll("dot")
@@ -215,10 +247,15 @@ Promise.all([
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
             .attr("name3", d => (d.points / totForyear) * 100)
+            .attr("name4", d => d.year)
+            .attr("name5", d => d.ID)
             .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
                 //console.log(i)
             })
+            .on('click', function(d,i){
+                displayDot(d3.select(this))
+            })    
             .on("mouseout", function(){
                 unHighLight(d3.select(this))
             })
@@ -312,8 +349,8 @@ Promise.all([
             .duration(200)
             .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
             .style("opacity", 1)
-            .style("left", (x + 300) + "px")
-            .style("top", (y + 30) + "px")    
+            .style("left", (x + 100) + "px")
+            .style("top", (y + 50) + "px")    
         }
         //Show only the name if it is a line
         else if(isDot == 0 && theName._groups[0][0].attributes[1].value != 0){
@@ -702,5 +739,90 @@ Promise.all([
     **          -Perhaps it could just be beside the first graph?
     *///***************************************************************************************************************
 
+    var c2Title = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
+        .style("text-anchor", "middle")
+        .text("Here is information for the selected driver. In order to select a driver, click on a dot.")
+
+    var c2Name = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 420) + ")")
+        .style("text-anchor", "left")
+        .text("Name: ")
+
+    var c2Year = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 400) + ")")
+        .style("text-anchor", "left")
+        .text("Year: ")
+
+    var c2Points = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 380) + ")")
+        .style("text-anchor", "left")
+        .text("Points: ")
+
+    var c2Team = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 360) + ")")
+        .style("text-anchor", "left")
+        .text("Team: ")
+
+    var c2Teammate = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 340) + ")")
+        .style("text-anchor", "left")
+        .text("Teammate: ")
+
+    function displayDot(info){        
+        c2Name.text("Name: " + info._groups[0][0].attributes.name.textContent)
+        c2Year.text("Year: " + info._groups[0][0].attributes.name4.textContent)
+        c2Points.text("Points: " + info._groups[0][0].attributes.name2.textContent)
+
+        var dId = info._groups[0][0].attributes.name5.textContent
+        var teamId = "none"
+        var teamName = "none"
+        var d2 = 0
+
+        races = years.get(info._groups[0][0].attributes.name4.textContent)
+
+        var seasonInfo2 = races.flatMap(function(v){
+            return raceStandings.get(v.raceId)
+        })
+
+        var driverPoints2 = d3.rollup(seasonInfo2, v => d3.sum(v, d => d.points), d => d.driverId)
+        //console.log(driverPoints2)
+
+        //find constructor id
+        for(var i = 0; i < seasonInfo2.length; i++){
+            if(seasonInfo2[i].driverId == info._groups[0][0].attributes.name5.textContent){
+                teamId = seasonInfo2[i].constructorId
+            }
+        }
+
+        //get team name from constructor id
+        for(var i = 0; i < dataset[3].length; i++){
+            if(teamId == dataset[3][i].constructorId){
+                teamName = dataset[3][i].name
+            }
+        }
+        c2Team.text("Team: " + teamName)
+        //console.log(driverNames)
+
+        //find other driver with same constructor
+        for(var i = 0; i < seasonInfo2.length; i++){
+            if(seasonInfo2[i].constructorId == teamId && seasonInfo2[i].driverId != dId){
+                d2 = seasonInfo2[i].driverId
+            }
+        }
+
+        var driverNames2 = Array.from(driverNames)
+        //get the teammate name
+        //console.log(driverNames2[0][1][0].driverId)
+        var tn1 = "none"
+        var tn2 = "none"
+        for(var i = 0; i < driverNames2.length; i++){
+            if(driverNames2[i][1][0].driverId == d2){
+                tn1 = driverNames2[i][1][0].forename
+                tn2 = driverNames2[i][1][0].surname
+            }
+        }
+        c2Teammate.text("Teammate: " + tn1 + " " + tn2)
+    }
 
 })
