@@ -190,12 +190,14 @@ Promise.all([
         .attr("cx", d => xScale(d.year) + 18)
         .attr("cy", d => yScale((d.points / totForyear) * 100))
         .attr("r", 3)
-        .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
         .attr("name3", d => (d.points / totForyear) * 100)
         .attr("name4", d => d.year)
         .attr("name5", d => d.ID)
+        .attr("fill", function(d){
+            return dotColor(d3.select(this))
+        })
         .on('mouseover', function(){
             highLight(d3.select(this), 1)
         })
@@ -243,13 +245,15 @@ Promise.all([
             .attr("cx", d => xScale(d.year) + 18)
             .attr("cy", d => yScale((d.points / totForyear) * 100))
             .attr("r", 3)
-            .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
             .attr("name3", d => (d.points / totForyear) * 100)
             .attr("name4", d => d.year)
             .attr("name5", d => d.ID)
-            .on("mouseover", function(d, i){
+            .attr("fill", function(d){
+                return dotColor(d3.select(this))
+            })
+                .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
                 //console.log(i)
             })
@@ -788,14 +792,14 @@ Promise.all([
 
         var driverPoints2 = d3.rollup(seasonInfo2, v => d3.sum(v, d => d.points), d => d.driverId)
 
-        //find constructor id
+        //find constructor id 
         for(var i = 0; i < seasonInfo2.length; i++){
             if(seasonInfo2[i].driverId == info._groups[0][0].attributes.name5.textContent){
                 teamId = seasonInfo2[i].constructorId
             }
         }
 
-        //get team name from constructor id
+        //get team name from constructor id 
         for(var i = 0; i < dataset[3].length; i++){
             if(teamId == dataset[3][i].constructorId){
                 teamName = dataset[3][i].name
@@ -822,5 +826,38 @@ Promise.all([
         }
         c2Teammate.text("Teammate: " + tn1 + " " + tn2)
     }
+    
+    function dotColor(info){        
+
+        console.log(info)
+        var dId = info._groups[0][0].attributes.name5.textContent
+        var teamId = "none"
+        var teamName = "none"
+        var d2 = 0
+
+        races = years.get(info._groups[0][0].attributes.name4.textContent)
+
+        var seasonInfo2 = races.flatMap(function(v){
+            return raceStandings.get(v.raceId)
+        })
+
+        var driverPoints2 = d3.rollup(seasonInfo2, v => d3.sum(v, d => d.points), d => d.driverId)
+
+        //find constructor id 
+        for(var i = 0; i < seasonInfo2.length; i++){
+            if(seasonInfo2[i].driverId == info._groups[0][0].attributes.name5.textContent){
+                teamId = seasonInfo2[i].constructorId
+            }
+        }
+        var colorCon = "none"
+        for(var i = 0; i < dataset[3].length; i++){
+            if(dataset[3][i].constructorId == teamId){
+                colorCon = dataset[3][i].hexColor
+            }
+        }
+        console.log(colorCon)
+        return colorCon
+    }
+
 
 })
