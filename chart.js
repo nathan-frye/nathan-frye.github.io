@@ -289,7 +289,8 @@ Promise.all([
             //set source x and y from current driver
             sourceX = dotArr[i]._groups[0][k].cx.baseVal.value
             sourceY = dotArr[i]._groups[0][k].cy.baseVal.value
-
+            var color = dotArr[i]._groups[0][k].attributes.fill.value
+            
             //loop through the next year i + 1 and find the driver
             for(var j = 0; j < dotArr[i + 1]._groups[0].length; j ++){
 
@@ -306,7 +307,7 @@ Promise.all([
 
                     //draw the line
                     edge = svg.append("line")
-                        .attr("stroke", scaleColor(currName))
+                        .attr("stroke", String(color))
                         .attr("stroke-width", 1.5)
                         .attr("x1", sourceX)
                         .attr("y1", sourceY)
@@ -722,7 +723,7 @@ Promise.all([
     **      achieved for each driver over their career (this can go over 100% since is a sum) and then show the top
     **      10 or something?
     **
-    **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
+    **-Secondary Visualization ----------------------------------------------------------------------------- COMPLETISH
     **  -Clicking dot or line will be used to select the driver for a secondary visualization
     **      -What information will this secondary vis have? Will be in a separate svg underneath or on the side.
     **          -Single season? Name, teammate, teamname(i.e. ferrari), points scored that season
@@ -786,7 +787,6 @@ Promise.all([
         })
 
         var driverPoints2 = d3.rollup(seasonInfo2, v => d3.sum(v, d => d.points), d => d.driverId)
-        //console.log(driverPoints2)
 
         //find constructor id
         for(var i = 0; i < seasonInfo2.length; i++){
@@ -802,7 +802,6 @@ Promise.all([
             }
         }
         c2Team.text("Team: " + teamName)
-        //console.log(driverNames)
 
         //find other driver with same constructor
         for(var i = 0; i < seasonInfo2.length; i++){
@@ -813,7 +812,6 @@ Promise.all([
 
         var driverNames2 = Array.from(driverNames)
         //get the teammate name
-        //console.log(driverNames2[0][1][0].driverId)
         var tn1 = "none"
         var tn2 = "none"
         for(var i = 0; i < driverNames2.length; i++){
