@@ -77,7 +77,7 @@ Promise.all([
 
     //using 30 for max percent temp
     var yScale = d3.scaleLinear()
-        .domain([46, 1])
+        .domain([0, 413])
         .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
     //Expanded color scale to reduce the amound of overlap in colors. Need over double for actual unique colors?
@@ -192,8 +192,9 @@ Promise.all([
         .append("circle")
         .attr("cx", d => xScale(d.year) + 18)
         .attr("cy", function(d,i) {
-            console.log(i)
-            return yScale(i+1)
+            return yScale(d.points)
+            //console.log(i)
+            // yScale(i+1)
         })
         .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
@@ -254,8 +255,9 @@ Promise.all([
             .append("circle")
             .attr("cx", d => xScale(d.year) + 18)
             .attr("cy", function(d,i) {
-                console.log(i)
-                return yScale(i+1)
+                return yScale(d.points)
+                //console.log(i)
+                //return yScale(i+1)
             })
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
