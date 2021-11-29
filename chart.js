@@ -4,7 +4,7 @@ Promise.all([
     d3.csv("driverInfo.csv"),
     d3.csv("raceInfo.csv"),
     d3.csv("results.csv"),
-    d3.csv("constructors.csv"),
+    /*d3.csv("constructors.csv")*/,
 ]).then(function(dataset)
 {
     var dimensions = {
@@ -77,7 +77,7 @@ Promise.all([
 
     //using 30 for max percent temp
     var yScale = d3.scaleLinear()
-        .domain([0, 35])
+        .domain([41, 1])
         .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
     //Expanded color scale to reduce the amound of overlap in colors. Need over double for actual unique colors?
@@ -159,7 +159,7 @@ Promise.all([
     //Map all driver info to driverId (aka surname and forename)
     var driverNames = d3.group(dataset[0], d => d.driverId)
     //console.log(driverNames)
-    
+
     //Convert driverPoints into an array
     var temp = Array.from(driverPoints)
     //console.log(temp)
@@ -168,15 +168,18 @@ Promise.all([
     var temp2 = Array.from(driverConstructor)
     //console.log(seasonInfo)
 
-
-
     //Map full driver names to their total points earned for the year (season)
     var data = temp.map(function(v){
         var d = driverNames.get(v[0])
         //console.log(d)
         return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0], ID: d[0].driverId}
     })
-
+    data.sort(function(d,v){
+        return d3.descending(d.points, v.points)
+    })
+    console.log(data)
+    
+    
     //array to store all the dots, used later for making the connecting lines
     //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
     //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
@@ -188,12 +191,12 @@ Promise.all([
         .enter()
         .append("circle")
         .attr("cx", d => xScale(d.year) + 18)
-        .attr("cy", d => yScale((d.points / totForyear) * 100))
+        .attr("cy", d => yScale(d.points))
         .attr("r", 3)
         .attr("fill", d => scaleColor(d.name))
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
-        .attr("name3", d => (d.points / totForyear) * 100)
+        .attr("name3", d => d.points)
         .attr("name4", d => d.year)
         .attr("name5", d => d.ID)
         .on('mouseover', function(){
@@ -241,12 +244,12 @@ Promise.all([
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.year) + 18)
-            .attr("cy", d => yScale((d.points / totForyear) * 100))
+            .attr("cy", d => yScale(d.points))
             .attr("r", 3)
             .attr("fill", d => scaleColor(d.name))
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
-            .attr("name3", d => (d.points / totForyear) * 100)
+            .attr("name3", d => d.points)
             .attr("name4", d => d.year)
             .attr("name5", d => d.ID)
             .on("mouseover", function(d, i){
@@ -739,7 +742,7 @@ Promise.all([
     **          -Perhaps it could just be beside the first graph?
     *///***************************************************************************************************************
 
-    var c2Title = svg2.append("text")
+/*    var c2Title = svg2.append("text")
         .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
         .style("text-anchor", "middle")
         .text("Here is information for the selected driver. In order to select a driver, click on a dot.")
@@ -823,6 +826,6 @@ Promise.all([
             }
         }
         c2Teammate.text("Teammate: " + tn1 + " " + tn2)
-    }
+    }*/
 
 })
