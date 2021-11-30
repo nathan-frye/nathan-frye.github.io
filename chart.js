@@ -822,6 +822,7 @@ Promise.all([
         }
 
         document.getElementById("infoTeam").innerHTML = teamName
+        document.getElementById("infoTeamColor").style.background = info._groups[0][0].attributes.fill.textContent
         //c2Team.text("Team: " + teamName)
 
         //find other driver with same constructor
