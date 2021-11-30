@@ -52,7 +52,7 @@
       }
 
       ul{
-        height: 350px;
+        height: 575px;
         overflow: hidden;
         overflow-y: scroll;
         border: solid black 2px;
@@ -79,6 +79,13 @@
       {
         background: white;
       }
+
+      table{
+        background: white;
+        border: solid black;
+        text-align: left;
+        display: block;
+      }
     </style>
 
     <meta charset="UTF-8"/>
@@ -98,6 +105,31 @@
     <section>
       <svg id="chart"></svg>
       <div id="menu">
+        <div id="info">
+          <table>
+            <caption>Driver Information:</caption>
+            <tr>
+              <td>Name:</td>
+              <td id="infoName">Click a dot!</td>
+            </tr>
+            <tr>
+              <td>Year:</td>
+              <td id="infoYear"> Click a dot!</td>
+            </tr>
+            <tr>
+              <td>Points:</td>
+              <td id="infoPoints"> Click a dot!</td>
+            </tr>
+            <tr>
+              <td>Team:</td>
+              <td id="infoTeam"> Click a dot!</td>
+            </tr>
+            <tr>
+              <td>Teammate:</td>
+              <td id="infoTeammate"> Click a dot!</td>
+            </tr>
+          </table>
+        </div>
         <div>
           <button id="champs">Champions Only</button>
           <button id="reset">Reset</button>

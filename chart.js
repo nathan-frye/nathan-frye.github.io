@@ -786,10 +786,14 @@ Promise.all([
         .text("Teammate: ")
 
     function displayDot(info){        
-        c2Name.text("Name: " + info._groups[0][0].attributes.name.textContent)
+        /*c2Name.text("Name: " + info._groups[0][0].attributes.name.textContent)
         c2Year.text("Year: " + info._groups[0][0].attributes.name4.textContent)
         c2Points.text("Points: " + info._groups[0][0].attributes.name2.textContent)
-
+        */
+        document.getElementById("infoName").innerHTML = info._groups[0][0].attributes.name.textContent
+        document.getElementById("infoYear").innerHTML = info._groups[0][0].attributes.name4.textContent
+        document.getElementById("infoPoints").innerHTML = info._groups[0][0].attributes.name2.textContent
+        
         var dId = info._groups[0][0].attributes.name5.textContent
         var teamId = "none"
         var teamName = "none"
@@ -816,7 +820,9 @@ Promise.all([
                 teamName = dataset[3][i].name
             }
         }
-        c2Team.text("Team: " + teamName)
+
+        document.getElementById("infoTeam").innerHTML = teamName
+        //c2Team.text("Team: " + teamName)
 
         //find other driver with same constructor
         for(var i = 0; i < seasonInfo2.length; i++){
@@ -835,7 +841,8 @@ Promise.all([
                 tn2 = driverNames2[i][1][0].surname
             }
         }
-        c2Teammate.text("Teammate: " + tn1 + " " + tn2)
+        //c2Teammate.text("Teammate: " + tn1 + " " + tn2)
+        document.getElementById("infoTeammate").innerHTML = tn1 + " " + tn2
     }
     
     //finds the correct color for a dot representing the constructor based on the name and year
