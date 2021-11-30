@@ -190,14 +190,17 @@ Promise.all([
         .attr("cx", d => xScale(d.year) + 18)
         .attr("cy", d => yScale((d.points / totForyear) * 100))
         .attr("r", 3)
+        //.attr("fill", "black")
+        .attr("fill", function(d){
+            //console.log(d)
+            return dotColor(d3.select(this), d.year, d.ID)
+        })
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
         .attr("name3", d => (d.points / totForyear) * 100)
         .attr("name4", d => d.year)
         .attr("name5", d => d.ID)
-        .attr("fill", function(d){
-            return dotColor(d3.select(this))
-        })
+        //.attr("fill", "black")
         .on('mouseover', function(){
             highLight(d3.select(this), 1)
         })
@@ -245,15 +248,17 @@ Promise.all([
             .attr("cx", d => xScale(d.year) + 18)
             .attr("cy", d => yScale((d.points / totForyear) * 100))
             .attr("r", 3)
+            //.attr("fill", "black")
+            .attr("fill", function(d){
+                return dotColor(d3.select(this), d.year, d.ID)
+            })
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
             .attr("name3", d => (d.points / totForyear) * 100)
             .attr("name4", d => d.year)
             .attr("name5", d => d.ID)
-            .attr("fill", function(d){
-                return dotColor(d3.select(this))
-            })
-                .on("mouseover", function(d, i){
+            //.attr("fill", "black")
+            .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
                 //console.log(i)
             })
@@ -827,17 +832,16 @@ Promise.all([
         c2Teammate.text("Teammate: " + tn1 + " " + tn2)
     }
     
-    function dotColor(info){        
+    function dotColor(info, y, id){        
 
         console.log(info)
-        var dId = info._groups[0][0].attributes.name5.textContent
+        console.log(y)
         var teamId = "none"
-        var teamName = "none"
-        var d2 = 0
 
-        races = years.get(info._groups[0][0].attributes.name4.textContent)
+        var race = years.get(String(y))
+        console.log(race)
 
-        var seasonInfo2 = races.flatMap(function(v){
+        var seasonInfo2 = race.flatMap(function(v){
             return raceStandings.get(v.raceId)
         })
 
@@ -845,7 +849,7 @@ Promise.all([
 
         //find constructor id 
         for(var i = 0; i < seasonInfo2.length; i++){
-            if(seasonInfo2[i].driverId == info._groups[0][0].attributes.name5.textContent){
+            if(seasonInfo2[i].driverId == id){
                 teamId = seasonInfo2[i].constructorId
             }
         }
