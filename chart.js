@@ -8,7 +8,7 @@ Promise.all([
 ]).then(function(dataset)
 {
     var dimensions = {
-        width: 1200,
+        width: 1300,
         height: 800,
         margin: {
             top: 10,
@@ -756,32 +756,32 @@ Promise.all([
     *///***************************************************************************************************************
 
     var c2Title = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 700) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
         .style("text-anchor", "middle")
-        .text("Here is information for the selected driver. In order to select a driver, click on a dot.")
+        .text("Click a dot for driver info.")
 
     var c2Name = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 420) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 600) + " ," + (dimensions2.height + dimensions2.margin.top - 420) + ")")
         .style("text-anchor", "left")
         .text("Name: ")
 
     var c2Year = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 400) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 600) + " ," + (dimensions2.height + dimensions2.margin.top - 400) + ")")
         .style("text-anchor", "left")
         .text("Year: ")
 
     var c2Points = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 380) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 600) + " ," + (dimensions2.height + dimensions2.margin.top - 380) + ")")
         .style("text-anchor", "left")
         .text("Points: ")
 
     var c2Team = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 360) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 600) + " ," + (dimensions2.height + dimensions2.margin.top - 360) + ")")
         .style("text-anchor", "left")
         .text("Team: ")
 
     var c2Teammate = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 340) + ")")
+        .attr("transform", "translate(" + (dimensions2.width/2 + 600) + " ," + (dimensions2.height + dimensions2.margin.top - 340) + ")")
         .style("text-anchor", "left")
         .text("Teammate: ")
 
