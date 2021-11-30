@@ -110,17 +110,23 @@ Promise.all([
 
     //graph information for easier user experience
     svg.append("text")
-    .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
-    .style("text-anchor", "middle")
-    .text("*Each line (and connecting dot) in this graph represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
+        .style("text-anchor", "middle")
+        .text("*Each line (and connecting dot) in this graph represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
 
     //graph information for easier user experience 2.0
     svg.append("text")
-    .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
-    .style("text-anchor", "middle")
-    .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
+        .style("text-anchor", "middle")
+        .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
 
-    //initialize the y axis
+    //graph information for easier user experience 3.0
+    svg.append("text")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 25) + ")")
+        .style("text-anchor", "middle")
+        .text("The different colors represent the team that a driver drove for. If a line changes colors that means that the driver changed to a different team.")
+
+        //initialize the y axis
     var yAxis = svg.append("g")
                 .call(yAxisgen)
                 .style("transform", `translateX(${dimensions.margin.left}px)`)
@@ -190,15 +196,17 @@ Promise.all([
         .attr("cx", d => xScale(d.year) + 18)
         .attr("cy", d => yScale((d.points / totForyear) * 100))
         .attr("r", 3)
-        //.attr("fille", "black")
+        //.attr("fill", "black")
+        .attr("fill", function(d){
+            //console.log(d)
+            return dotColor(d3.select(this), d.year, d.ID)
+        })
         .attr("name", d => d.name)
         .attr("name2", d=> d.points)
         .attr("name3", d => (d.points / totForyear) * 100)
         .attr("name4", d => d.year)
         .attr("name5", d => d.ID)
-        .attr("fill", function(d){
-            return dotColor(d3.select(this))
-        })
+        //.attr("fill", "black")
         .on('mouseover', function(){
             highLight(d3.select(this), 1)
         })
@@ -246,16 +254,17 @@ Promise.all([
             .attr("cx", d => xScale(d.year) + 18)
             .attr("cy", d => yScale((d.points / totForyear) * 100))
             .attr("r", 3)
-            //.attr("fille", "black")
+            //.attr("fill", "black")
+            .attr("fill", function(d){
+                return dotColor(d3.select(this), d.year, d.ID)
+            })
             .attr("name", d => d.name)
             .attr("name2", d => d.points)
             .attr("name3", d => (d.points / totForyear) * 100)
             .attr("name4", d => d.year)
             .attr("name5", d => d.ID)
-            .attr("fill", function(d){
-                return dotColor(d3.select(this))
-            })
-                .on("mouseover", function(d, i){
+            //.attr("fill", "black")
+            .on("mouseover", function(d, i){
                 highLight(d3.select(this), 1)
                 //console.log(i)
             })
@@ -290,7 +299,7 @@ Promise.all([
         for(var k = 0; k < dotArr[i]._groups[0].length; k++){
 
             //pull out specific name too search for in the next year
-            currName = dotArr[i]._groups[0][k].attributes[3].textContent
+            currName = dotArr[i]._groups[0][k].attributes[4].textContent
 
             //set source x and y from current driver
             sourceX = dotArr[i]._groups[0][k].cx.baseVal.value
@@ -301,9 +310,8 @@ Promise.all([
             for(var j = 0; j < dotArr[i + 1]._groups[0].length; j ++){
 
                 //find same driver if they are in that year
-                if(dotArr[i + 1]._groups[0][j].attributes[3].textContent == currName){
+                if(dotArr[i + 1]._groups[0][j].attributes[4].textContent == currName){
                     //If found and not already stored, store the name
-                    console.log("he")
                     if(!(secondaryNames.includes(currName)))
                     {
                         secondaryNames.push(currName)
@@ -311,6 +319,7 @@ Promise.all([
                     //set target x and y from current driver from the next year
                     targetX = dotArr[i + 1]._groups[0][j].cx.baseVal.value
                     targetY = dotArr[i + 1]._groups[0][j].cy.baseVal.value
+
                     //draw the line
                     edge = svg.append("line")
                         .attr("stroke", String(color))
@@ -376,8 +385,7 @@ Promise.all([
             //loop through drivers in year i
             for(var k = 0; k < dotArr[i]._groups[0].length; k++){
                 //if find the name, change the attribute for r to 8 making the dot larger
-                //console.log(dotArr[i]._groups[0][k].attributes[3].textContent)
-                if(dotArr[i]._groups[0][k].attributes[3].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
                     dotArr[i]._groups[0][k].attributes.r.value = 8
                 }
                 //else make them smaller!
@@ -573,7 +581,7 @@ Promise.all([
                 //loop through drivers in year i
                 for(var k = 0; k < dotArr[i]._groups[0].length; k++){
                     //if find the name, change the attribute for r to 8 making the dot larger
-                    if(dotArr[i]._groups[0][k].attributes[3].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
                         dotArr[i]._groups[0][k].attributes.r.value = 8
                     }
                     //else make them smaller!
@@ -830,17 +838,17 @@ Promise.all([
         c2Teammate.text("Teammate: " + tn1 + " " + tn2)
     }
     
-    function dotColor(info){        
+    //finds the correct color for a dot representing the constructor based on the name and year
+    function dotColor(info, y, id){        
 
-        //console.log(info._groups[0][0].attributes)
-        var dId = info._groups[0][0].attributes.name5.textContent
+        //console.log(info)
+        //console.log(y)
         var teamId = "none"
-        var teamName = "none"
-        var d2 = 0
 
-        races = years.get(info._groups[0][0].attributes.name4.textContent)
+        var race = years.get(String(y))
+        //console.log(race)
 
-        var seasonInfo2 = races.flatMap(function(v){
+        var seasonInfo2 = race.flatMap(function(v){
             return raceStandings.get(v.raceId)
         })
 
@@ -848,7 +856,7 @@ Promise.all([
 
         //find constructor id 
         for(var i = 0; i < seasonInfo2.length; i++){
-            if(seasonInfo2[i].driverId == info._groups[0][0].attributes.name5.textContent){
+            if(seasonInfo2[i].driverId == id){
                 teamId = seasonInfo2[i].constructorId
             }
         }
