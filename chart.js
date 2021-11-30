@@ -1,4 +1,4 @@
-\/*Promise.all should create an array of the data files.
+/*Promise.all should create an array of the data files.
 Access driverInfo.csv with dataset[0], raceInfo with dataset[1], etc.*/
 Promise.all([
     d3.csv("driverInfo.csv"),
@@ -573,7 +573,7 @@ Promise.all([
                 //loop through drivers in year i
                 for(var k = 0; k < dotArr[i]._groups[0].length; k++){
                     //if find the name, change the attribute for r to 8 making the dot larger
-                    if(dotArr[i]._groups[0][k].attributes[4].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    if(dotArr[i]._groups[0][k].attributes[3].textContent == tempName && dotArr[i]._groups[0][k].attributes.r.value != 0){
                         dotArr[i]._groups[0][k].attributes.r.value = 8
                     }
                     //else make them smaller!
