@@ -187,6 +187,7 @@ Promise.all([
     //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
     //notation to access the name dotArr[0]._groups[0][0].attributes[4].textContent
     var dotArr = []
+    var conArr = []
 
     //creating the dots for the first year
     var dots = svg.selectAll("dot")
@@ -366,7 +367,7 @@ Promise.all([
             .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
             .style("opacity", 1)
             .style("left", (x + 100) + "px")
-            .style("top", (y + 50) + "px")    
+            .style("top", (y + 10) + "px")    
         }
         //Show only the name if it is a line
         else if(isDot == 0 && theName._groups[0][0].attributes[1].value != 0){
@@ -375,8 +376,8 @@ Promise.all([
             .duration(200)
             .text(String(tempName))
             .style("opacity", 1)
-            .style("left", (x + 300) + "px")
-            .style("top", (y + 50) + "px")    
+            .style("left", (x + 100) + "px")
+            .style("top", (y + 10) + "px")    
         }
 
 
@@ -866,6 +867,8 @@ Promise.all([
         for(var i = 0; i < seasonInfo2.length; i++){
             if(seasonInfo2[i].driverId == id){
                 teamId = seasonInfo2[i].constructorId
+                if(!conArr.includes(teamId))
+                    conArr.push(teamId)
             }
         }
         var colorCon = "none"
@@ -877,6 +880,4 @@ Promise.all([
         //console.log(colorCon)
         return colorCon
     }
-
-
 })
