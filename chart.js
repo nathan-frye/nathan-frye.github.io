@@ -230,6 +230,7 @@ Promise.all([
         for(var k = 0; k < points.length; k++){
             totForyear += points[k];
         }
+        totAllTime += totForyear;
         
         driverNames = d3.group(dataset[0], d => d.driverId)
         
@@ -877,7 +878,7 @@ Promise.all([
         .attr("x", d => {
             return xScale2(d)})
         .attr("y", 300)
-        .attr("width", xScale2.bandwidth())
+        .attr("width", xScale2.bandwidth() - 5)
         .attr("height", 50)
         .attr("fill", function(d,i){
             return colors2[i]
