@@ -724,36 +724,11 @@ Promise.all([
     /******************************************************************************************************************
     ** NEED TO DO:
     **
-    **-Better Colors ----------------------------------------------------------------------------------------- COMPLETE
-    **  -Right now colors get repeated in the same year and individuals get lost, need a unique color for each driver?
+    ** -Change y coords of dots to represent final position rather than percentage of points. -------------- INCOMPLETE
     **
-    **-Highlighting driver on mouseover (simple interaction) - and mouseout removes highlight ---------------- COMPLETE
-    **  -Mouseover will also bring up a popup with driver name - DONE
-    **  -Mayber other info? Can add a variable to determine if a dot and show how many points? - DONE
-    **  -Make other unhighlighted data darker/smaller - DONE
-    **
-    **-Filters to remove some drivers (simple interaction)? -------------------------------------------------- COMPLETE
-    **  -Graph is crowded, may need to have ability to clear it up, not super necessary right now
-    **  -Button to show only drivers who have won a championship - DONE
-    **  -Maybe something like, find out which top % of the drivers have the most points? Find out sum of percentage
-    **      achieved for each driver over their career (this can go over 100% since is a sum) and then show the top
-    **      10 or something?
-    **
-    **-Secondary Visualization ----------------------------------------------------------------------------- COMPLETISH
-    **  -Clicking dot or line will be used to select the driver for a secondary visualization
-    **      -What information will this secondary vis have? Will be in a separate svg underneath or on the side.
-    **          -Single season? Name, teammate, teamname(i.e. ferrari), points scored that season
-    **          -Career? Name, similar to first graph but only the single driver? Total lifetime points
-    **      -Idea: Ability to click a driver in first vis, and add them to secondary vis, allowing a user to pick just
-    **          the drivers that they want, and display the info in the same way?
-    **      -Idea: Clicking a dot will give information specific to that driver and year. Like teammate, team name
-    **          same points, and points percentage. Mayybe info specific to each race in that season?
-    **          Does it have to be a fancy chart or can it be something like:
-    **          Name:       "xxx"
-    **          Year:       "xxx"
-    **          Team:       "xxx"
-    **          Teammate:   "xxx"
-    **          -Perhaps it could just be beside the first graph?
+    **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
+    **  -Chart of teams, with total lifetime points achieved for each? (can store in a 2d array maybe)
+    **  -Mostly just a way so users can see what colors should represent
     *///***************************************************************************************************************
 
     var c2Title = svg2.append("text")
