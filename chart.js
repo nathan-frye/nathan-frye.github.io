@@ -18,17 +18,6 @@ Promise.all([
         }
     }
 
-    var dimensions2 = {
-        width: 1000,
-        height: 400,
-        margin: {
-            top: 10,
-            bottom: 30,
-            right: 10,
-            left: 50
-        }
-    }
-
     //Tooltip and tooltip style
     var tooltip = d3.select("body")
         .append("div")
@@ -47,12 +36,9 @@ Promise.all([
     var svg = d3.select("#chart")
         .style("width", dimensions.width)
         .style("height", dimensions.height)
+        //This moves the chart up and to the left, may not need it?
         .attr("transform", "translate(" + (-410) + "," + (-200) + ")")
-
-    var svg2 = d3.select("#chart2")
-        .style("width", dimensions2.width)
-        .style("height", dimensions2.height)
-
+    
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
 
@@ -153,9 +139,13 @@ Promise.all([
     //variable to store all the points in a year for calculating percentage later
     var totForyear = 0
 
+    //keep track of total points all time
+    var totAllTime = 0;
+
     for(var i = 0; i < points.length; i++){
         totForyear += points[i];
     }
+    totAllTime += totForyear;
 
     //Map all driver info to driverId (aka surname and forename)
     var driverNames = d3.group(dataset[0], d => d.driverId)
@@ -741,36 +731,6 @@ Promise.all([
     **  -Mostly just a way so users can see what colors should represent
     *///***************************************************************************************************************
 
-    var c2Title = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
-        .style("text-anchor", "middle")
-        .text("Here is information for the selected driver. In order to select a driver, click on a dot.")
-
-    var c2Name = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 420) + ")")
-        .style("text-anchor", "left")
-        .text("Name: ")
-
-    var c2Year = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 400) + ")")
-        .style("text-anchor", "left")
-        .text("Year: ")
-
-    var c2Points = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 380) + ")")
-        .style("text-anchor", "left")
-        .text("Points: ")
-
-    var c2Team = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 360) + ")")
-        .style("text-anchor", "left")
-        .text("Team: ")
-
-    var c2Teammate = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 340) + ")")
-        .style("text-anchor", "left")
-        .text("Teammate: ")
-
     function displayDot(info){        
         /*c2Name.text("Name: " + info._groups[0][0].attributes.name.textContent)
         c2Year.text("Year: " + info._groups[0][0].attributes.name4.textContent)
@@ -865,4 +825,88 @@ Promise.all([
         //console.log(colorCon)
         return colorCon
     }
+
+    //Secondary visualization Under here
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    var dimensions2 = {
+        width: 1000,
+        height: 500,
+        margin: {
+            top: 10,
+            bottom: 150,
+            right: 10,
+            left: 50
+        }
+    }
+
+    var svg2 = d3.select("#chart2")
+    .style("width", dimensions2.width)
+    .style("height", dimensions2.height)
+
+    var labels2 = []
+    var colors2 = []
+    //loop through constructors and get name from conArr
+    for(var i = 0; i < dataset[3].length; i++){
+        if(conArr.includes(dataset[3][i].constructorId)){
+            labels2.push(dataset[3][i].name)
+            colors2.push(dataset[3][i].hexColor)
+        }
+    }
+
+    //set up x and y axis
+    var xScale2 = d3.scaleBand()
+        .domain(labels2)
+        .range([dimensions2.margin.left, dimensions2.width - dimensions2.margin.right])
+
+    //position rather than points %
+    var yScale2 = d3.scaleLinear()
+        .domain([0,10])
+        .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
+
+    //axis generator
+    var xAxisgen2 = d3.axisBottom().scale(xScale2)
+    var yAxisgen2 = d3.axisLeft().scale(yScale2)
+    
+
+    //create the legend// convert to bar chart later
+    var legend = svg2.selectAll("rect")
+        .data(labels2)
+        .enter()
+        .append("rect")
+        .attr("x", d => {
+            return xScale2(d)})
+        .attr("y", 300)
+        .attr("width", xScale2.bandwidth())
+        .attr("height", 50)
+        .attr("fill", function(d,i){
+            return colors2[i]
+        })
+
+    //This stuff probably won't need to change
+    //initialize the x-axis
+    var xAxis2 = svg2.append("g")
+        .call(xAxisgen2)
+        .style("transform", `translateY(${dimensions2.height - dimensions2.margin.bottom}px)`)
+        .selectAll("text")
+            .attr("transform", "rotate(-65)")
+            .attr("dx", "-3.5em")
+            .attr("dy", ".2em")
+
+    //x axis label
+    svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 70) + ")")
+        .style("text-anchor", "middle")
+        .text("Team Names")
+
+    //graph information for easier user experience
+    svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 55) + ")")
+        .style("text-anchor", "middle")
+        .text("Colors correlate to the dot colors")
+
+        //initialize the y axis
+    var yAxis2 = svg2.append("g")
+                .call(yAxisgen2)
+                .style("transform", `translateX(${dimensions.margin.left}px)`)
 })
