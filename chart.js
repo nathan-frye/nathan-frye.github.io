@@ -76,8 +76,14 @@ Promise.all([
         .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
 
     //using 30 for max percent temp
+    /*
     var yScale = d3.scaleLinear()
         .domain([0, 35])
+        .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
+    */
+    //position rather than points %
+    var yScale = d3.scaleLinear()
+        .domain([46, 1])
         .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top])
 
     //Expanded color scale to reduce the amound of overlap in colors. Need over double for actual unique colors?
@@ -138,7 +144,7 @@ Promise.all([
         .attr("x", 0 - 355)
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Percentage of Points Earned Out of Total Points")
+        .text("Final Position in Championship (Drivers with 0 points still given a position below others)")
 
     //Extract race info for the year (season) we're starting with
     var seasonInfo = races.flatMap(function(v){
@@ -182,6 +188,10 @@ Promise.all([
         //console.log(d)
         return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[0], ID: d[0].driverId}
     })
+    data.sort(function(d,v){
+        return d3.descending(d.points, v.points)
+    })
+    //console.log(data)
 
     //array to store all the dots, used later for making the connecting lines
     //notation to access cx for example dotArr[0]._groups[0][0].cx.baseVal.value
@@ -195,7 +205,10 @@ Promise.all([
         .enter()
         .append("circle")
         .attr("cx", d => xScale(d.year) + 18)
-        .attr("cy", d => yScale((d.points / totForyear) * 100))
+        //.attr("cy", d => yScale((d.points / totForyear) * 100))
+        .attr("cy", function(d,i){
+            return yScale(i + 1)
+        })
         .attr("r", 3)
         //.attr("fill", "black")
         .attr("fill", function(d){
@@ -247,13 +260,20 @@ Promise.all([
             var d = driverNames.get(v[0])
             return {name: d[0].forename + " " + d[0].surname, points: v[1], year: labels[i], ID: d[0].driverId}
         })
+        data.sort(function(d,v){
+            return d3.descending(d.points, v.points)
+        })    
     
         dots = svg.selectAll("dot")
             .data(data)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.year) + 18)
-            .attr("cy", d => yScale((d.points / totForyear) * 100))
+            //.attr("cy", d => yScale((d.points / totForyear) * 100))
+            .attr("cy", function(d,i){
+                //console.log(i + " " + d.name)
+                return yScale(i + 1)
+            })
             .attr("r", 3)
             //.attr("fill", "black")
             .attr("fill", function(d){
@@ -276,7 +296,7 @@ Promise.all([
                 unHighLight(d3.select(this))
             })
 
-        dotArr.push(dots)    
+        dotArr.push(dots)  
     }
 
     
@@ -330,6 +350,7 @@ Promise.all([
                         .attr("x2", targetX)
                         .attr("y2", targetY)
                         .attr("name", currName)
+                        .attr("opacity", 0.3)
                         .on('mouseover', function(){
                             highLight(d3.select(this), 0)
                         })
@@ -722,9 +743,9 @@ Promise.all([
     }
 
     /******************************************************************************************************************
-    ** NEED TO DO:
+    ** NEED TO DO: Fix Line strength too yo
     **
-    ** -Change y coords of dots to represent final position rather than percentage of points. -------------- INCOMPLETE
+    ** -Change y coords of dots to represent final position rather than percentage of points. ---------------- COMPLETE
     **
     **-Secondary Visualization ----------------------------------------------------------------------------- INCOMPLETE
     **  -Chart of teams, with total lifetime points achieved for each? (can store in a 2d array maybe)
