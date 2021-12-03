@@ -8,8 +8,8 @@ Promise.all([
 ]).then(function(dataset)
 {
     var dimensions = {
-        width: 1200,
-        height: 800,
+        width: 800,
+        height: 550,
         margin: {
             top: 10,
             bottom: 100,
@@ -20,7 +20,7 @@ Promise.all([
 
     var dimensions2 = {
         width: 1000,
-        height: 500,
+        height: 400,
         margin: {
             top: 10,
             bottom: 30,
@@ -29,7 +29,7 @@ Promise.all([
         }
     }
 
-    //Need this for showing the name and other information when mousing over a line/dot
+    //Tooltip and tooltip style
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
@@ -47,6 +47,7 @@ Promise.all([
     var svg = d3.select("#chart")
         .style("width", dimensions.width)
         .style("height", dimensions.height)
+        .attr("transform", "translate(" + (-410) + "," + (-200) + ")")
 
     var svg2 = d3.select("#chart2")
         .style("width", dimensions2.width)
@@ -118,19 +119,7 @@ Promise.all([
     svg.append("text")
         .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
         .style("text-anchor", "middle")
-        .text("*Each line (and connecting dot) in this graph represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
-
-    //graph information for easier user experience 2.0
-    svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
-        .style("text-anchor", "middle")
-        .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
-
-    //graph information for easier user experience 3.0
-    svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 25) + ")")
-        .style("text-anchor", "middle")
-        .text("The different colors represent the team that a driver drove for. If a line changes colors that means that the driver changed to a different team.")
+        .text("*Each line represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
 
         //initialize the y axis
     var yAxis = svg.append("g")
@@ -141,10 +130,10 @@ Promise.all([
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - 5)
-        .attr("x", 0 - 355)
+        .attr("x", 0 - 250)
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Final Position in Championship (Drivers with 0 points still given a position below others)")
+        .text("Final Position in Championship")
 
     //Extract race info for the year (season) we're starting with
     var seasonInfo = races.flatMap(function(v){
