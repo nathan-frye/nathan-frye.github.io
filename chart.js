@@ -813,6 +813,7 @@ Promise.all([
         for(var i = 0; i < seasonInfo2.length; i++){
             if(seasonInfo2[i].driverId == id){
                 teamId = seasonInfo2[i].constructorId
+                //build list of constructors in our visualization
                 if(!conArr.includes(teamId))
                     conArr.push(teamId)
             }
@@ -885,6 +886,7 @@ Promise.all([
         })
 
     //This stuff probably won't need to change
+    //console.log(totAllTime)
     //initialize the x-axis
     var xAxis2 = svg2.append("g")
         .call(xAxisgen2)
