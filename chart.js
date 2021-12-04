@@ -864,7 +864,7 @@ Promise.all([
 
     //number of drivers
     var yScale2 = d3.scaleBand()
-        .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
+        .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])
         .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
 
     //axis generator
@@ -886,6 +886,13 @@ Promise.all([
         .style("text-anchor", "middle")
         .text("Number of Drivers: mouse over a bar")
 
+    //graph information for easier user experience
+    svg2.append("text")
+    .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 40) + ")")
+    .style("text-anchor", "middle")
+    .text("Interestingly, teams with only 2 drivers were around for a single year.")
+
+
         //initialize the y axis
     var yAxis2 = svg2.append("g")
                 .call(yAxisgen2)
@@ -899,7 +906,7 @@ Promise.all([
         var tempCol = colors2[i]
 
         //loop through years
-        for(var j = 0; j < 30; j++){
+        for(var j = 0; j <= 30; j++){
             //loop through drivers
             for(var k = 0; k < dotArr[j]._groups[0].length; k++){
                 //if color matches and not in tempArr
