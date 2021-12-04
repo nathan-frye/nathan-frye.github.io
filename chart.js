@@ -131,7 +131,6 @@ Promise.all([
 
     //Tie result to constructor id
     var driverConstructor = d3.group(seasonInfo, d => d.constructorId)
-    //console.log(driverConstructor)
 
     //Make an array of total points earned for y-axis
     var points = Array.from(driverPoints.values())
@@ -157,8 +156,7 @@ Promise.all([
 
     //same for driverConstructor
     var temp2 = Array.from(driverConstructor)
-    //console.log(seasonInfo)
-
+    //console.log(temp2)
 
 
     //Map full driver names to their total points earned for the year (season)
@@ -828,9 +826,19 @@ Promise.all([
         return colorCon
     }
 
+    //console.log(conArr)
+
     //Secondary visualization Under here
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
+    var tempColorArray = []
+    for(var i = 0; i < dotArr.length; ++i)
+    {
+        for(var j = 0; j < dotArr[i]._groups[0].length; ++j)
+        {
+            tempColorArray.push(dotArr[i]._groups[0][j].attributes.fill.textContent)
+        }
+    }
     var dimensions2 = {
         width: 1000,
         height: 500,
@@ -848,6 +856,9 @@ Promise.all([
 
     var labels2 = []
     var colors2 = []
+    var driverCount = []
+    var secondary_vis_data = []
+
     //loop through constructors and get name from conArr
     for(var i = 0; i < dataset[3].length; i++){
         if(conArr.includes(dataset[3][i].constructorId)){
@@ -856,6 +867,19 @@ Promise.all([
         }
     }
 
+    for(var i = 0; i < colors2.length; ++i)
+    {
+        var colorTemp = tempColorArray.filter(d => d == colors2[i])
+        //console.log(colorTemp)
+        driverCount.push(colorTemp.length)
+    }
+
+        for(var i = 0; i < labels2.length; ++i)
+    {
+        secondary_vis_data.push({label: labels2[i], color: colors2[i], count: driverCount})
+    }
+    console.log(secondary_vis_data)
+
     //set up x and y axis
     var xScale2 = d3.scaleBand()
         .domain(labels2)
@@ -863,7 +887,7 @@ Promise.all([
 
     //position rather than points %
     var yScale2 = d3.scaleLinear()
-        .domain([0,10])
+        .domain([0, Math.max(...driverCount)])
         .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
 
     //axis generator
