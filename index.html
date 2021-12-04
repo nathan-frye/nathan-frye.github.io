@@ -5,45 +5,43 @@
 
     <!-- Tried putting into .css file, but for some reason localhost won't use .css files -->
     <style>
-      
-      svg
-      {
-        display: inline-block;
-        margin: auto;
+      .display_title {
+        grid-area: title;
+        border: solid black 2px;
+      }
+      .display_info {
+        grid-area: info;
+        padding-top: 30px;
+      }
+      .display_scatter {
+        grid-area: chart;
+        padding-top: 100px;
+      }
+      .display_bar {
+        grid-area: chart2;
+        padding-top: 100px;
+      }
+
+      .display_footer {
+        grid-area: footer;
+        border: solid black 2px;
+      }
+
+      .grid-container{
+        display: grid;
+        grid-template-areas:
+          'title title title'
+          'chart chart2 info'
+          'chart chart2 info'
+          'footer footer footer';
       }
 
       body{
-        background-color: lightgray;
-      }
-  
-      header{
-        text-align: center;
-        background-color: lightblue;
-      }
-
-      nav{
-        text-align: center;
-        background-color: lightgreen;
+        background-color: lightsteelblue;
       }
 
       section{
         text-align: center;
-        background-color: lightsteelblue;
-      }
-
-      footer{
-        text-align: center;
-        background-color: lightsalmon;
-      }
-
-      section div{
-        display: inline-block;
-        font-size: 16px;
-      }
-
-      section div div{
-        margin-top: 0px;
-        display: block;
       }
 
       button{
@@ -52,7 +50,7 @@
       }
 
       ul{
-        height: 575px;
+        height: 525px;
         overflow: hidden;
         overflow-y: scroll;
         border: solid black 2px;
@@ -95,54 +93,51 @@
   </head>
 
   <body>
-
-    <header>
-
-      <h1>Formula 1 Championship Point Percentages per Driver 1990-2020</h1>
-
-    </header>
-
     <section>
-      <svg id="chart"></svg>
-      <div id="menu">
-        <div id="info">
-          <table>
-            <caption>Driver Information:</caption>
-            <tr>
-              <td>Name:</td>
-              <td id="infoName">Click a dot!</td>
-            </tr>
-            <tr>
-              <td>Year:</td>
-              <td id="infoYear"> Click a dot!</td>
-            </tr>
-            <tr>
-              <td>Points:</td>
-              <td id="infoPoints"> Click a dot!</td>
-            </tr>
-            <tr>
-              <td>Team:</td>
-              <td id="infoTeam"> Click a dot!</td>
-            </tr>
-            <tr>
-              <td>Team Color:</td>
-              <td id="infoTeamColor"></td>
-            </tr>
-            <tr>
-              <td>Teammate:</td>
-              <td id="infoTeammate"> Click a dot!</td>
-            </tr>
-          </table>
+      <div class="grid-container">
+        <div class="display_title"><h1>Formula 1 Championship Drivers in Years 1990-2020</h1></div>
+        <svg class="display_scatter" id="chart"></svg>
+        <svg class="display_bar" id="chart2"></svg>
+        <div class="display_info" id="menu">
+          <div id="info">
+            <table>
+              <caption>Driver Information:</caption>
+              <tr>
+                <td>Name:</td>
+                <td id="infoName">Click a dot!</td>
+              </tr>
+              <tr>
+                <td>Year:</td>
+                <td id="infoYear"> Click a dot!</td>
+              </tr>
+              <tr>
+                <td>Points:</td>
+                <td id="infoPoints"> Click a dot!</td>
+              </tr>
+              <tr>
+                <td>Team:</td>
+                <td id="infoTeam"> Click a dot!</td>
+              </tr>
+              <tr>
+                <td>Team Color:</td>
+                <td id="infoTeamColor"></td>
+              </tr>
+              <tr>
+                <td>Teammate:</td>
+                <td id="infoTeammate"> Click a dot!</td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <button id="champs">Champions Only</button>
+            <button id="reset">Reset</button>
+            <button id="clear">Clear</button>
+          </div>
         </div>
-        <div>
-          <button id="champs">Champions Only</button>
-          <button id="reset">Reset</button>
-          <button id="clear">Clear</button>
-        </div>
+        <script type="module" src="chart.js"></script>
+        <div class="display_footer"><h2>Group 3: Landen Kirkland, Joshua Pitts, Nathan Frye</h2></div>
       </div>
-      <script type="module" src="chart.js"></script>
     </section>
-
   </body>
 
 </html>

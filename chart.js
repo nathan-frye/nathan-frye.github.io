@@ -9,7 +9,7 @@ Promise.all([
 {
     var dimensions = {
         width: 800,
-        height: 550,
+        height: 600,
         margin: {
             top: 10,
             bottom: 100,
@@ -37,7 +37,7 @@ Promise.all([
         .style("width", dimensions.width)
         .style("height", dimensions.height)
         //This moves the chart up and to the left, may not need it?
-        .attr("transform", "translate(" + (-410) + "," + (-200) + ")")
+        //.attr("transform", "translate(" + (-410) + "," + (-200) + ")")
     
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
@@ -115,10 +115,10 @@ Promise.all([
     //y axis label
     svg.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - 5)
-        .attr("x", 0 - 250)
+        .attr("y", 0)
+        .attr("x", -150)
         .attr("dy", "1em")
-        .style("text-anchor", "middle")
+        .style("text-anchor", "end")
         .text("Final Position in Championship")
 
     //Extract race info for the year (season) we're starting with
@@ -832,8 +832,8 @@ Promise.all([
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     var dimensions2 = {
-        width: 1000,
-        height: 500,
+        width: 800,
+        height: 600,
         margin: {
             top: 10,
             bottom: 150,
@@ -953,9 +953,9 @@ Promise.all([
     svg2.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 0)
-    .attr("x", 0 - 180)
+    .attr("x", 0 - 175)
     .attr("dy", "1em")
-    .style("text-anchor", "middle")
+    .style("text-anchor", "end")
     .text("Number of drivers")
 
 })
