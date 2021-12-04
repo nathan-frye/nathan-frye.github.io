@@ -8,8 +8,8 @@ Promise.all([
 ]).then(function(dataset)
 {
     var dimensions = {
-        width: 1200,
-        height: 800,
+        width: 800,
+        height: 550,
         margin: {
             top: 10,
             bottom: 100,
@@ -18,18 +18,7 @@ Promise.all([
         }
     }
 
-    var dimensions2 = {
-        width: 1000,
-        height: 500,
-        margin: {
-            top: 10,
-            bottom: 30,
-            right: 10,
-            left: 50
-        }
-    }
-
-    //Need this for showing the name and other information when mousing over a line/dot
+    //Tooltip and tooltip style
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
@@ -47,11 +36,9 @@ Promise.all([
     var svg = d3.select("#chart")
         .style("width", dimensions.width)
         .style("height", dimensions.height)
-
-    var svg2 = d3.select("#chart2")
-        .style("width", dimensions2.width)
-        .style("height", dimensions2.height)
-
+        //This moves the chart up and to the left, may not need it?
+        .attr("transform", "translate(" + (-410) + "," + (-200) + ")")
+    
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
 
@@ -118,19 +105,7 @@ Promise.all([
     svg.append("text")
         .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
         .style("text-anchor", "middle")
-        .text("*Each line (and connecting dot) in this graph represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
-
-    //graph information for easier user experience 2.0
-    svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 40) + ")")
-        .style("text-anchor", "middle")
-        .text("You can hover your mouse over any line to highlight it and see the driver name, and hovering over a dot will reveal more information.")
-
-    //graph information for easier user experience 3.0
-    svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 25) + ")")
-        .style("text-anchor", "middle")
-        .text("The different colors represent the team that a driver drove for. If a line changes colors that means that the driver changed to a different team.")
+        .text("*Each line represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
 
         //initialize the y axis
     var yAxis = svg.append("g")
@@ -141,10 +116,10 @@ Promise.all([
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - 5)
-        .attr("x", 0 - 355)
+        .attr("x", 0 - 250)
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Final Position in Championship (Drivers with 0 points still given a position below others)")
+        .text("Final Position in Championship")
 
     //Extract race info for the year (season) we're starting with
     var seasonInfo = races.flatMap(function(v){
@@ -164,9 +139,13 @@ Promise.all([
     //variable to store all the points in a year for calculating percentage later
     var totForyear = 0
 
+    //keep track of total points all time
+    var totAllTime = 0;
+
     for(var i = 0; i < points.length; i++){
         totForyear += points[i];
     }
+    totAllTime += totForyear;
 
     //Map all driver info to driverId (aka surname and forename)
     var driverNames = d3.group(dataset[0], d => d.driverId)
@@ -251,6 +230,7 @@ Promise.all([
         for(var k = 0; k < points.length; k++){
             totForyear += points[k];
         }
+        totAllTime += totForyear;
         
         driverNames = d3.group(dataset[0], d => d.driverId)
         
@@ -752,36 +732,6 @@ Promise.all([
     **  -Mostly just a way so users can see what colors should represent
     *///***************************************************************************************************************
 
-    var c2Title = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 450) + ")")
-        .style("text-anchor", "middle")
-        .text("Here is information for the selected driver. In order to select a driver, click on a dot.")
-
-    var c2Name = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 420) + ")")
-        .style("text-anchor", "left")
-        .text("Name: ")
-
-    var c2Year = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 400) + ")")
-        .style("text-anchor", "left")
-        .text("Year: ")
-
-    var c2Points = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 380) + ")")
-        .style("text-anchor", "left")
-        .text("Points: ")
-
-    var c2Team = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 360) + ")")
-        .style("text-anchor", "left")
-        .text("Team: ")
-
-    var c2Teammate = svg2.append("text")
-        .attr("transform", "translate(" + (dimensions2.width/2 - 200) + " ," + (dimensions2.height + dimensions2.margin.top - 340) + ")")
-        .style("text-anchor", "left")
-        .text("Teammate: ")
-
     function displayDot(info){        
         /*c2Name.text("Name: " + info._groups[0][0].attributes.name.textContent)
         c2Year.text("Year: " + info._groups[0][0].attributes.name4.textContent)
@@ -863,6 +813,7 @@ Promise.all([
         for(var i = 0; i < seasonInfo2.length; i++){
             if(seasonInfo2[i].driverId == id){
                 teamId = seasonInfo2[i].constructorId
+                //build list of constructors in our visualization
                 if(!conArr.includes(teamId))
                     conArr.push(teamId)
             }
@@ -876,4 +827,128 @@ Promise.all([
         //console.log(colorCon)
         return colorCon
     }
+
+    //Secondary visualization Under here
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    var dimensions2 = {
+        width: 1000,
+        height: 500,
+        margin: {
+            top: 10,
+            bottom: 150,
+            right: 10,
+            left: 50
+        }
+    }
+
+    var svg2 = d3.select("#chart2")
+    .style("width", dimensions2.width)
+    .style("height", dimensions2.height)
+
+    var labels2 = []
+    var colors2 = []
+
+    //loop through constructors and get name from conArr
+    for(var i = 0; i < dataset[3].length; i++){
+        if(conArr.includes(dataset[3][i].constructorId)){
+            labels2.push(dataset[3][i].name)
+            colors2.push(dataset[3][i].hexColor)
+        }
+    }
+
+    //set up x and y axis
+    var xScale2 = d3.scaleBand()
+        .domain(labels2)
+        .range([dimensions2.margin.left, dimensions2.width - dimensions2.margin.right])
+
+    //number of drivers
+    var yScale2 = d3.scaleBand()
+        .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
+        .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
+
+    //axis generator
+    var xAxisgen2 = d3.axisBottom().scale(xScale2)
+    var yAxisgen2 = d3.axisLeft().scale(yScale2)
+
+    var legend
+    var bars2 = []
+
+    //x axis label
+    svg2.append("text")
+    .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 70) + ")")
+    .style("text-anchor", "middle")
+    .text("Team Names")
+
+    //graph information for easier user experience
+    var textNum = svg2.append("text")
+        .attr("transform", "translate(" + (dimensions2.width/2) + " ," + (dimensions2.height + dimensions2.margin.top - 55) + ")")
+        .style("text-anchor", "middle")
+        .text("Number of Drivers: mouse over a bar")
+
+        //initialize the y axis
+    var yAxis2 = svg2.append("g")
+                .call(yAxisgen2)
+                .style("transform", `translateX(${dimensions.margin.left}px)`)
+
+
+    //create bars one team at a time
+    for(var i = 0; i < conArr.length; i++){
+        //will store drivers who drove for that team
+        var tempArr = []
+        var tempCol = colors2[i]
+
+        //loop through years
+        for(var j = 0; j < 30; j++){
+            //loop through drivers
+            for(var k = 0; k < dotArr[j]._groups[0].length; k++){
+                //if color matches and not in tempArr
+                if(dotArr[j]._groups[0][k].attributes.fill.textContent == tempCol && !tempArr.includes(dotArr[j]._groups[0][k].attributes.name.textContent)){
+                    tempArr.push(dotArr[j]._groups[0][k].attributes.name.textContent)
+                }
+            }
+        }
+
+        //make the bar
+        legend = svg2.append("rect")
+            .attr("x", xScale2(labels2[i]) + 3)
+            .attr("y", yScale2(tempArr.length))
+            .attr("width", xScale2.bandwidth() - 5)
+            .attr("height", dimensions2.height - dimensions2.margin.bottom - yScale2(tempArr.length))
+            .attr("fill", colors2[i])
+            .style("stroke-width", 1)
+            .style("stroke", "black")
+            .attr("num", tempArr.length)
+            .on("mouseover", function(){
+                var tempNum = d3.select(this)._groups[0][0].attributes.num.textContent
+                textNum.text("Number of Drivers: " + tempNum)
+            })
+            .on("mouseout", function(){
+                textNum.text("Number of Drivers: mouse over a bar")
+            })
+        
+        bars2.push(legend)
+
+    }
+
+    //This stuff probably won't need to change
+    //console.log(totAllTime)
+    //initialize the x-axis
+    var xAxis2 = svg2.append("g")
+        .call(xAxisgen2)
+        .style("transform", `translateY(${dimensions2.height - dimensions2.margin.bottom}px)`)
+        .selectAll("text")
+            .attr("transform", "rotate(-65)")
+            .attr("dx", "-3.5em")
+            .attr("dy", ".2em")
+
+    //y axis label
+    svg2.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0)
+    .attr("x", 0 - 180)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Number of drivers")
+
 })
