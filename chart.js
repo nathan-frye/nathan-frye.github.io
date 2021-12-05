@@ -8,16 +8,15 @@ Promise.all([
 ]).then(function(dataset)
 {
     var dimensions = {
-        width: 800,
+        width: 850,
         height: 600,
         margin: {
-            top: 10,
+            top: 15,
             bottom: 100,
             right: 10,
             left: 50
         }
     }
-
     //Tooltip and tooltip style
     var tooltip = d3.select("body")
         .append("div")
@@ -367,8 +366,8 @@ Promise.all([
             .duration(200)
             .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
             .style("opacity", 1)
-            .style("left", (x + 100) + "px")
-            .style("top", (y + 10) + "px")    
+            .style("left", (x + 30) + "px")
+            .style("top", (y + 100) + "px")    
         }
         //Show only the name if it is a line
         else if(isDot == 0 && theName._groups[0][0].attributes[1].value != 0){
@@ -377,8 +376,8 @@ Promise.all([
             .duration(200)
             .text(String(tempName))
             .style("opacity", 1)
-            .style("left", (x + 100) + "px")
-            .style("top", (y + 10) + "px")    
+            .style("left", (x + 30) + "px")
+            .style("top", (y + 100) + "px")    
         }
 
 
