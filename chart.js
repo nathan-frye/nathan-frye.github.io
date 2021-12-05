@@ -661,8 +661,6 @@ Promise.all([
             }
             isSelected = 0
         }
-        console.log(dotArr)
-        console.log(lines)   
     }
 
     //Run through list and highlight all champions
@@ -694,8 +692,6 @@ Promise.all([
             }
             j++
         }
-        console.log(dotArr)
-        console.log(lines)
     }
 
     //Reset the user selections
@@ -709,8 +705,6 @@ Promise.all([
             d[i].classList.add('checked')
             i++
         }
-        console.log(dotArr)
-        console.log(lines)
     }
 
     //Clear the user selections
@@ -724,8 +718,6 @@ Promise.all([
             d[i].classList.remove('checked')
             i++
         }
-        console.log(dotArr)
-        console.log(lines)
     }
 
     /******************************************************************************************************************
@@ -869,13 +861,13 @@ Promise.all([
         .range([dimensions2.margin.left, dimensions2.width - dimensions2.margin.right])
 
     //number of drivers
-    var yScale2 = d3.scaleBand()
-        .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])
+    var yScale2 = d3.scaleLinear()
+        .domain([0, 34])
         .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
 
     //axis generator
     var xAxisgen2 = d3.axisBottom().scale(xScale2)
-    var yAxisgen2 = d3.axisLeft().scale(yScale2)
+    var yAxisgen2 = d3.axisLeft().ticks(34).scale(yScale2)
 
     var legend
     var bars2 = []
@@ -937,7 +929,6 @@ Promise.all([
             .on("mouseover", function(){
                 var tempNum = d3.select(this)._groups[0][0].attributes.num.textContent
                 textNum.text("Number of Drivers: " + tempNum)
-                console.log(d3.select(this)._groups[0][0].attributes.fill.textContent)
                 highLight_teams(d3.select(this)._groups[0][0].attributes.fill.textContent)
             })
             .on("mouseout", function(){
@@ -969,22 +960,15 @@ Promise.all([
     .style("text-anchor", "end")
     .text("Number of drivers")
 
-    console.log(dotArr)
-    console.log(lines)
-
     function highLight_teams(highlight_color){
 
         //keeps track of the mouse position
         const[x,y] = d3.pointer(event)
 
-        console.log(highlight_color)
-
         //loop through years
         for(var i = 0; i <= 30; i++){
             //loop through drivers in year i
             for(var k = 0; k < dotArr[i]._groups[0].length; k++){
-                
-                console.log(dotArr[i]._groups[0][k].attributes[3].textContent)
                 //if find the name, change the attribute for r to 8 making the dot larger
                 if(dotArr[i]._groups[0][k].attributes[3].textContent == highlight_color && dotArr[i]._groups[0][k].attributes.r.value != 0){
                     dotArr[i]._groups[0][k].attributes.r.value = 8
