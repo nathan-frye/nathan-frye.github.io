@@ -11,8 +11,8 @@ Promise.all([
         width: 800,
         height: 600,
         margin: {
-            top: 10,
-            bottom: 100,
+            top: 15,
+            bottom: 95,
             right: 10,
             left: 50
         }
@@ -94,16 +94,21 @@ Promise.all([
     var xAxis = svg.append("g")
         .call(xAxisgen)
         .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
+        .selectAll("text")
+            .attr("transform", "rotate(-65)")
+            .attr("dx", "-1.8em")
+            .attr("dy", ".1em")
+
 
     //x axis label
     svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 70) + ")")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 65) + ")")
         .style("text-anchor", "middle")
         .text("Year (season)")
 
     //graph information for easier user experience
     svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 55) + ")")
+        .attr("transform", "translate(" + (dimensions.width/2) + " ," + (dimensions.height + dimensions.margin.top - 50) + ")")
         .style("text-anchor", "middle")
         .text("*Each line represents a driver that competed in the Formula 1 racing series between 1990 and 2020.")
 
@@ -363,12 +368,12 @@ Promise.all([
             var tempPerc = theName._groups[0][0].attributes.name3.textContent
             tempPerc = tempPerc.substring(0, 4)
             tooltip
-            .transition()
-            .duration(200)
-            .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
-            .style("opacity", 1)
-            .style("left", (x + 100) + "px")
-            .style("top", (y + 10) + "px")    
+                .transition()
+                .duration(200)
+                .text(String(tempName) + "; Points: " + tempPoints + "; Points Percentage: " + tempPerc + "%")
+                .style("opacity", 1)
+                .style("left", (x - 50) + "px")
+                .style("top", (y + 100) + "px")    
         }
         //Show only the name if it is a line
         else if(isDot == 0 && theName._groups[0][0].attributes[1].value != 0){
@@ -377,8 +382,8 @@ Promise.all([
             .duration(200)
             .text(String(tempName))
             .style("opacity", 1)
-            .style("left", (x + 100) + "px")
-            .style("top", (y + 10) + "px")    
+            .style("left", (x - 50) + "px")
+            .style("top", (y + 100) + "px")    
         }
 
 
@@ -421,8 +426,8 @@ Promise.all([
 
         //remove tooltip
         tooltip.transition()
-        .duration(500)
-        .style("opacity", 0)
+            .duration(500)
+            .style("opacity", 0)
         
         //loop through years
         for(var i = 0; i <= 30; i++){
