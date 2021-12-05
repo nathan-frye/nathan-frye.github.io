@@ -9,7 +9,7 @@ Promise.all([
 {
     var dimensions = {
         width: 800,
-        height: 550,
+        height: 600,
         margin: {
             top: 10,
             bottom: 100,
@@ -37,7 +37,7 @@ Promise.all([
         .style("width", dimensions.width)
         .style("height", dimensions.height)
         //This moves the chart up and to the left, may not need it?
-        .attr("transform", "translate(" + (-410) + "," + (-200) + ")")
+        //.attr("transform", "translate(" + (-410) + "," + (-200) + ")")
     
     //Group data by year (season)
     var years = d3.group(dataset[1], d=>d.year)
@@ -115,10 +115,10 @@ Promise.all([
     //y axis label
     svg.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - 5)
-        .attr("x", 0 - 250)
+        .attr("y", 0)
+        .attr("x", -150)
         .attr("dy", "1em")
-        .style("text-anchor", "middle")
+        .style("text-anchor", "end")
         .text("Final Position in Championship")
 
     //Extract race info for the year (season) we're starting with
@@ -335,7 +335,7 @@ Promise.all([
                             highLight(d3.select(this), 0)
                         })
                         .on('mouseout', function(){
-                            unHighLight(d3.select(this))
+                            unHighLight()
                         })
 
                         lines.push(edge)
@@ -415,9 +415,7 @@ Promise.all([
 
     /*Opposite of highLight, returns the dots and lines to normal unless they are hidden.
     */
-    function unHighLight(theName){
-        //pull out the name of driver to be set to normal
-        var tempName = theName._groups[0][0].attributes.name.textContent
+    function unHighLight(){
 
         //remove tooltip
         tooltip.transition()
@@ -662,7 +660,7 @@ Promise.all([
                 lines[i]._groups[0][0].attributes[1].value = 0
             }
             isSelected = 0
-        }   
+        }
     }
 
     //Run through list and highlight all champions
@@ -832,8 +830,8 @@ Promise.all([
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     var dimensions2 = {
-        width: 1000,
-        height: 500,
+        width: 800,
+        height: 600,
         margin: {
             top: 10,
             bottom: 150,
@@ -863,13 +861,13 @@ Promise.all([
         .range([dimensions2.margin.left, dimensions2.width - dimensions2.margin.right])
 
     //number of drivers
-    var yScale2 = d3.scaleBand()
-        .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])
+    var yScale2 = d3.scaleLinear()
+        .domain([0, 34])
         .range([dimensions2.height - dimensions2.margin.bottom, dimensions2.margin.top])
 
     //axis generator
     var xAxisgen2 = d3.axisBottom().scale(xScale2)
-    var yAxisgen2 = d3.axisLeft().scale(yScale2)
+    var yAxisgen2 = d3.axisLeft().ticks(34).scale(yScale2)
 
     var legend
     var bars2 = []
@@ -898,6 +896,7 @@ Promise.all([
                 .call(yAxisgen2)
                 .style("transform", `translateX(${dimensions.margin.left}px)`)
 
+    var allTeamDriverArr = []
 
     //create bars one team at a time
     for(var i = 0; i < conArr.length; i++){
@@ -915,6 +914,7 @@ Promise.all([
                 }
             }
         }
+        allTeamDriverArr.push(tempArr)
 
         //make the bar
         legend = svg2.append("rect")
@@ -929,9 +929,11 @@ Promise.all([
             .on("mouseover", function(){
                 var tempNum = d3.select(this)._groups[0][0].attributes.num.textContent
                 textNum.text("Number of Drivers: " + tempNum)
+                highLight_teams(d3.select(this)._groups[0][0].attributes.fill.textContent)
             })
             .on("mouseout", function(){
                 textNum.text("Number of Drivers: mouse over a bar")
+                unHighLight()
             })
         
         bars2.push(legend)
@@ -953,9 +955,39 @@ Promise.all([
     svg2.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 0)
-    .attr("x", 0 - 180)
+    .attr("x", 0 - 175)
     .attr("dy", "1em")
-    .style("text-anchor", "middle")
+    .style("text-anchor", "end")
     .text("Number of drivers")
 
+    function highLight_teams(highlight_color){
+
+        //keeps track of the mouse position
+        const[x,y] = d3.pointer(event)
+
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                //if find the name, change the attribute for r to 8 making the dot larger
+                if(dotArr[i]._groups[0][k].attributes[3].textContent == highlight_color && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 8
+                }
+                //else make them smaller!
+                else if(dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 1
+                }
+            }
+        }
+
+        //do it all again for lines
+        for(var i = 0; i < lines.length; i++){
+            if(lines[i]._groups[0][0].attributes[0].textContent == highlight_color && lines[i]._groups[0][0].attributes[1].value != 0){
+                lines[i]._groups[0][0].attributes[1].value = 5
+            }
+            else if(lines[i]._groups[0][0].attributes[1].value != 0){
+                lines[i]._groups[0][0].attributes[1].value = 0.2
+            }
+        }
+    }
 })
