@@ -335,7 +335,7 @@ Promise.all([
                             highLight(d3.select(this), 0)
                         })
                         .on('mouseout', function(){
-                            unHighLight(d3.select(this))
+                            unHighLight()
                         })
 
                         lines.push(edge)
@@ -415,9 +415,7 @@ Promise.all([
 
     /*Opposite of highLight, returns the dots and lines to normal unless they are hidden.
     */
-    function unHighLight(theName){
-        //pull out the name of driver to be set to normal
-        var tempName = theName._groups[0][0].attributes.name.textContent
+    function unHighLight(){
 
         //remove tooltip
         tooltip.transition()
@@ -662,7 +660,9 @@ Promise.all([
                 lines[i]._groups[0][0].attributes[1].value = 0
             }
             isSelected = 0
-        }   
+        }
+        console.log(dotArr)
+        console.log(lines)   
     }
 
     //Run through list and highlight all champions
@@ -694,6 +694,8 @@ Promise.all([
             }
             j++
         }
+        console.log(dotArr)
+        console.log(lines)
     }
 
     //Reset the user selections
@@ -707,6 +709,8 @@ Promise.all([
             d[i].classList.add('checked')
             i++
         }
+        console.log(dotArr)
+        console.log(lines)
     }
 
     //Clear the user selections
@@ -720,6 +724,8 @@ Promise.all([
             d[i].classList.remove('checked')
             i++
         }
+        console.log(dotArr)
+        console.log(lines)
     }
 
     /******************************************************************************************************************
@@ -898,6 +904,7 @@ Promise.all([
                 .call(yAxisgen2)
                 .style("transform", `translateX(${dimensions.margin.left}px)`)
 
+    var allTeamDriverArr = []
 
     //create bars one team at a time
     for(var i = 0; i < conArr.length; i++){
@@ -915,6 +922,7 @@ Promise.all([
                 }
             }
         }
+        allTeamDriverArr.push(tempArr)
 
         //make the bar
         legend = svg2.append("rect")
@@ -929,9 +937,12 @@ Promise.all([
             .on("mouseover", function(){
                 var tempNum = d3.select(this)._groups[0][0].attributes.num.textContent
                 textNum.text("Number of Drivers: " + tempNum)
+                console.log(d3.select(this)._groups[0][0].attributes.fill.textContent)
+                highLight_teams(d3.select(this)._groups[0][0].attributes.fill.textContent)
             })
             .on("mouseout", function(){
                 textNum.text("Number of Drivers: mouse over a bar")
+                unHighLight()
             })
         
         bars2.push(legend)
@@ -958,4 +969,41 @@ Promise.all([
     .style("text-anchor", "end")
     .text("Number of drivers")
 
+    console.log(dotArr)
+    console.log(lines)
+
+    function highLight_teams(highlight_color){
+
+        //keeps track of the mouse position
+        const[x,y] = d3.pointer(event)
+
+        console.log(highlight_color)
+
+        //loop through years
+        for(var i = 0; i <= 30; i++){
+            //loop through drivers in year i
+            for(var k = 0; k < dotArr[i]._groups[0].length; k++){
+                
+                console.log(dotArr[i]._groups[0][k].attributes[3].textContent)
+                //if find the name, change the attribute for r to 8 making the dot larger
+                if(dotArr[i]._groups[0][k].attributes[3].textContent == highlight_color && dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 8
+                }
+                //else make them smaller!
+                else if(dotArr[i]._groups[0][k].attributes.r.value != 0){
+                    dotArr[i]._groups[0][k].attributes.r.value = 1
+                }
+            }
+        }
+
+        //do it all again for lines
+        for(var i = 0; i < lines.length; i++){
+            if(lines[i]._groups[0][0].attributes[0].textContent == highlight_color && lines[i]._groups[0][0].attributes[1].value != 0){
+                lines[i]._groups[0][0].attributes[1].value = 5
+            }
+            else if(lines[i]._groups[0][0].attributes[1].value != 0){
+                lines[i]._groups[0][0].attributes[1].value = 0.2
+            }
+        }
+    }
 })
