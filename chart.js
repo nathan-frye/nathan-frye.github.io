@@ -182,7 +182,7 @@ Promise.all([
         .data(data)
         .enter()
         .append("circle")
-        .attr("cx", d => xScale(d.year) + 18)
+        .attr("cx", d => xScale(d.year) + 13)
         //.attr("cy", d => yScale((d.points / totForyear) * 100))
         .attr("cy", function(d,i){
             return yScale(i + 1)
@@ -247,7 +247,7 @@ Promise.all([
             .data(data)
             .enter()
             .append("circle")
-            .attr("cx", d => xScale(d.year) + 18)
+            .attr("cx", d => xScale(d.year) + 13)
             //.attr("cy", d => yScale((d.points / totForyear) * 100))
             .attr("cy", function(d,i){
                 //console.log(i + " " + d.name)
